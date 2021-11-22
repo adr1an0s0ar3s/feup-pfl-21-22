@@ -15,9 +15,9 @@ scanner s = if head s == '-' then [- digitToInt x | x <- take 1 s'] ++ [digitToI
 
 scanner' :: String -> BigNumber
 scanner' []         = []
-scanner' [a]        = [digitToInt a]
-scanner' (a:b:cs)   | a == '-'  = (- digitToInt b) : [digitToInt x | x <- cs]
-                    | otherwise = [digitToInt x | x <- a:b:cs]
+scanner' [a]        = [read [a] :: Int]
+scanner' (a:b:cs)   | a == '-'  = (- read [b] :: Int) : [read [x] :: Int | x <- cs]
+                    | otherwise = [read [x] :: Int | x <- a:b:cs]
 
 ----------------------- 2.3 -----------------------
 
@@ -30,4 +30,4 @@ output' :: BigNumber -> String
 output' [] = []
 output' (x:xs)  | x < 0 = '-' : bignumber
                 | otherwise = bignumber
-                where bignumber = [intToDigit (abs a) | a <- x:xs]
+                where bignumber = foldr (\a b -> show (abs a) ++ b) [] (x:xs)
