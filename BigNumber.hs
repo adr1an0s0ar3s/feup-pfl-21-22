@@ -31,3 +31,23 @@ output' [] = []
 output' (x:xs)  | x < 0 = '-' : bignumber
                 | otherwise = bignumber
                 where bignumber = foldr (\a b -> show (abs a) ++ b) [] (x:xs)
+
+----------------------- 2.4 -----------------------
+
+somaBn :: BigNumber -> BigNumber -> BigNumber
+somaBn bn1 bn2 = reverse (dealWithCarry bn3)
+                where
+                     bn1' = reverse bn1
+                     bn2' = reverse bn2
+                     bn3 = zipWith(+) bn1' bn2'
+ 
+
+dealWithCarry :: BigNumber -> BigNumber
+dealWithCarry [] = []
+dealWithCarry (x:xs) | x > 10 = x `mod` 10 : dealWithCarry (replaceFirst (head xs + 1) xs)
+                     | x == 10 = 0 : dealWithCarry (replaceFirst (head xs + 1) xs)
+                     | otherwise = x : dealWithCarry xs
+
+
+replaceFirst :: a -> [a] -> [a]
+replaceFirst newVal (x:xs) = newVal:xs          
