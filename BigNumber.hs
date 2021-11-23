@@ -36,11 +36,16 @@ output' (x:xs)  | x < 0 = '-' : bignumber
 
 somaBn :: BigNumber -> BigNumber -> BigNumber
 somaBn bn1 bn2 = reverse (dealWithCarry bn3)
-                where
-                     bn1' = reverse bn1
-                     bn2' = reverse bn2
+                 where
+                     bn1' = if diff >= 0 then reverse (fillWithZeros 0 bn1) else reverse (fillWithZeros (abs diff) bn1)
+                     bn2' = if diff >= 0 then reverse (fillWithZeros diff bn2) else reverse (fillWithZeros 0 bn2)
                      bn3 = zipWith(+) bn1' bn2'
- 
+                     diff = length bn1 - length bn2
+
+
+fillWithZeros :: Int -> BigNumber -> BigNumber
+fillWithZeros n bn = [ x * 0 | x <- [1..n]] ++ bn
+
 
 dealWithCarry :: BigNumber -> BigNumber
 dealWithCarry [] = []
@@ -50,4 +55,4 @@ dealWithCarry (x:xs) | x > 10 = x `mod` 10 : dealWithCarry (replaceFirst (head x
 
 
 replaceFirst :: a -> [a] -> [a]
-replaceFirst newVal (x:xs) = newVal:xs          
+replaceFirst newVal (x:xs) = newVal:xs         
