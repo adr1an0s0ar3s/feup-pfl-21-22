@@ -36,22 +36,30 @@ output' (x:xs)  | x < 0 = '-' : bignumber
 
 somaBn :: BigNumber -> BigNumber -> BigNumber
 somaBn bn1 bn2 = reverse (dealWithCarry bn3)
-                 where
-                     bn1' = if diff >= 0 then reverse bn1 else reverse (fillWithZeros (abs diff) bn1)
-                     bn2' = if diff >= 0 then reverse (fillWithZeros diff bn2) else reverse bn2
-                     bn3 = zipWith(+) bn1' bn2'
-                     diff = length bn1 - length bn2
-
+    where bn1' = if diff >= 0 then reverse bn1 else reverse (fillWithZeros (abs diff) bn1)
+          bn2' = if diff >= 0 then reverse (fillWithZeros diff bn2) else reverse bn2
+          bn3 = zipWith (+) bn1' bn2'
+          diff = length bn1 - length bn2
 
 fillWithZeros :: Int -> BigNumber -> BigNumber
-fillWithZeros n bn = [ x * 0 | x <- [1..n]] ++ bn
-
+fillWithZeros n bn = [0 | x <- [1..n]] ++ bn
 
 dealWithCarry :: BigNumber -> BigNumber
 dealWithCarry [] = []
-dealWithCarry (x:xs) | x >= 10 = x `mod` 10 : dealWithCarry (replaceFirst (head xs + 1) xs)
-                     | otherwise = x : dealWithCarry xs
+dealWithCarry [a]   | a >= 10   = (a `mod` 10) : [a `div` 10]
+                    | otherwise = [a]
+dealWithCarry (a:b:cs) | a >= 10 = a `mod` 10 : dealWithCarry ((b + a `div` 10) : cs)
+                       | otherwise = a : dealWithCarry (b:cs)
 
 
-replaceFirst :: a -> [a] -> [a]
-replaceFirst newVal (x:xs) = newVal:xs         
+
+-- Alternative way: funciona com números positivos apenas!
+somaBn' :: BigNumber -> BigNumber -> BigNumber
+somaBn' a b = somaBnAux (reverse a) (reverse b) 0
+
+somaBnAux :: BigNumber -> BigNumber -> Int -> BigNumber
+somaBnAux [] [] 0             = []
+somaBnAux [] [] carry         = [carry]
+somaBnAux [] (b:bs) carry     = somaBnAux [] bs ((b + carry) `div` 10) ++ [(b + carry) `mod` 10]
+somaBnAux (a:as) [] carry     = somaBnAux as [] ((a + carry) `div` 10) ++ [(a + carry) `mod` 10]
+somaBnAux (a:as) (b:bs) carry = somaBnAux as bs ((a + b + carry) `div` 10) ++ [(a + b + carry) `mod` 10]
