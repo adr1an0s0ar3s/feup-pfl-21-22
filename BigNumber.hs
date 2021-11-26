@@ -2,11 +2,44 @@ module BigNumber where
 
 import Data.Char
 
+
+-------------------- Auxilixary --------------------
+
+
+addHeaderZerosBN :: Int -> BigNumber -> BigNumber
+addHeaderZerosBN x bn = [0 | _ <- [1..x]] ++ bn
+
+addFooterZerosBN :: Int -> BigNumber -> BigNumber
+addFooterZerosBN x bn = bn ++ [0 | _ <- [1..x]]
+
+removeHeaderZerosBN :: BigNumber -> BigNumber
+removeHeaderZerosBN [] = []
+removeHeaderZerosBN (x:xs) | x /= 0 = x:xs
+                           | otherwise = removeHeaderZerosBN xs
+
+toggleSignalBN :: BigNumber -> BigNumber
+toggleSignalBN [] = []
+toggleSignalBN (x:xs)   | x == 0 = x : toggleSignalBN xs
+                        | otherwise = (-x):xs
+
+greaterThanBN :: BigNumber -> BigNumber -> Bool
+greaterThanBN [] [] = False
+greaterThanBN xs [] = True
+greaterThanBN [] ys = False
+greaterThanBN (x:xs) (y:ys) | x < 0 && y < 0 = toggleSignalBN bn1 < toggleSignalBN bn2
+                            | otherwise = bn1 > bn2
+                            where bn1 = addHeaderZerosBN (length (y:ys) - length (x:xs)) (x:xs)
+                                  bn2 = addHeaderZerosBN (length (x:xs) - length (y:ys)) (y:ys)
+
+
 ----------------------- 2.1 -----------------------
+
 
 type BigNumber = [Int]
 
+
 ----------------------- 2.2 -----------------------
+
 
 scanner :: String -> BigNumber
 scanner []         = []
@@ -14,7 +47,9 @@ scanner [a]        = [read [a] :: Int]
 scanner (a:b:cs)    | a == '-'  = (- read [b] :: Int) : [read [x] :: Int | x <- cs]
                     | otherwise = [read [x] :: Int | x <- a:b:cs]
 
+
 ----------------------- 2.3 -----------------------
+
 
 output :: BigNumber -> String
 output [] = []
@@ -22,50 +57,64 @@ output (x:xs)   | x < 0 = '-' : bignumber
                 | otherwise = bignumber
                 where bignumber = foldr (\a b -> show (abs a) ++ b) [] (x:xs)
 
+
 ----------------------- 2.4 -----------------------
 
-somaBn :: BigNumber -> BigNumber -> BigNumber
-somaBn a b = somaBnAux (reverse a) (reverse b) 0
 
-somaBnAux :: BigNumber -> BigNumber -> Int -> BigNumber
-somaBnAux [] [] 0             = []
-somaBnAux [] [] carry         = [carry]
-somaBnAux [] bs 0             = reverse bs
-somaBnAux [] (b:bs) carry     = somaBnAux [] bs ((b + carry) `div` 10) ++ [(b + carry) `mod` 10]
-somaBnAux as [] 0             = reverse as
-somaBnAux (a:as) [] carry     = somaBnAux as [] ((a + carry) `div` 10) ++ [(a + carry) `mod` 10]
-somaBnAux (a:as) (b:bs) carry = somaBnAux as bs ((a + b + carry) `div` 10) ++ [(a + b + carry) `mod` 10]
+somaBN :: BigNumber -> BigNumber -> BigNumber
+somaBN [] [] = []
+somaBN xs [] = xs
+somaBN [] ys = ys
+somaBN (x:xs) (y:ys) | x < 0 && y > 0 = subBN (y:ys) (toggleSignalBN (x:xs))
+                     | x > 0 && y < 0 = subBN (x:xs) (toggleSignalBN (y:ys))
+                     | x > 0 && y > 0 = somaBNAux (reverse (x:xs)) (reverse (y:ys)) 0
+                     | otherwise = toggleSignalBN (somaBNAux (reverse (toggleSignalBN (x:xs))) (reverse (toggleSignalBN (y:ys))) 0)
+
+somaBNAux :: BigNumber -> BigNumber -> Int -> BigNumber
+somaBNAux [] [] 0             = []
+somaBNAux [] [] carry         = [carry]
+somaBNAux [] bs 0             = reverse bs
+somaBNAux [] (b:bs) carry     = somaBNAux [] bs ((b + carry) `div` 10) ++ [(b + carry) `mod` 10]
+somaBNAux as [] 0             = reverse as
+somaBNAux (a:as) [] carry     = somaBNAux as [] ((a + carry) `div` 10) ++ [(a + carry) `mod` 10]
+somaBNAux (a:as) (b:bs) carry = somaBNAux as bs ((a + b + carry) `div` 10) ++ [(a + b + carry) `mod` 10]
+
 
 ----------------------- 2.5 -----------------------
 
-toggleSignalBn :: BigNumber -> BigNumber
-toggleSignalBn [] = []
-toggleSignalBn (x:xs)   | x == 0 = x : toggleSignalBn xs
-                        | otherwise = (-x):xs
 
-greaterThanBn :: BigNumber -> BigNumber -> Bool
-greaterThanBn [] [] = False
-greaterThanBn xs [] = True
-greaterThanBn [] ys = False
-greaterThanBn (x:xs) (y:ys) | x < 0 && y < 0 = toggleSignalBn bn1 < toggleSignalBn bn2
-                            | otherwise = bn1 > bn2
-                            where   bn1 = [0 | _ <- [1 .. length (y:ys) - length (x:xs)]] ++ x:xs
-                                    bn2 = [0 | _ <- [1 .. length (x:xs) - length (y:ys)]] ++ y:ys
+subBN :: BigNumber -> BigNumber -> BigNumber
+subBN [] [] = []
+subBN xs [] = xs
+subBN [] ys = toggleSignalBN ys
+subBN (x:xs) (y:ys) | (x:xs) == (y:ys) = []
+                    | x < 0 && y > 0 = toggleSignalBN (somaBN (toggleSignalBN (x:xs)) (y:ys))
+                    | x > 0 && y < 0 = somaBN (x:xs) (toggleSignalBN (y:ys))
+                    | x < 0 && y < 0 = subBN (toggleSignalBN (y:ys)) (toggleSignalBN (x:xs))
+                    | greaterThanBN (x:xs) (y:ys) = removeHeaderZerosBN(subBNAux (reverse bn1) (reverse bn2))
+                    | otherwise = toggleSignalBN (removeHeaderZerosBN (subBNAux (reverse bn2) (reverse bn1)))
+                    where bn1 = addHeaderZerosBN (length (y:ys) - length (x:xs)) (x:xs)
+                          bn2 = addHeaderZerosBN (length (x:xs) - length (y:ys)) (y:ys)
 
-subBn :: BigNumber -> BigNumber -> BigNumber
-subBn a b	| a == b = [0]
-            | greaterThanBn a b = subBnAux (reverse bn1) (reverse bn2)
-    		| otherwise = toggleSignalBn (subBnAux (reverse bn2) (reverse bn1))
-			where   bn1 = [0 | _ <- [1 .. length b - length a]] ++ a
-                                bn2 = [0 | _ <- [1 .. length a - length b]] ++ b
-
-subBnAux :: BigNumber -> BigNumber -> BigNumber
-subBnAux [] [] = []
-subBnAux xs [] = xs
-subBnAux (x:xs) (y:ys)  | x <= y = subBnAux xs ((head ys + 1):(tail ys)) ++ [x + 10 - y]
-                        | otherwise = subBnAux xs ys ++ [x - y]
+subBNAux :: BigNumber -> BigNumber -> BigNumber
+subBNAux [] [] = []
+subBNAux (x:xs) (y:ys)  | x < y = subBNAux xs ((head ys + 1) : tail ys) ++ [x + 10 - y]
+                        | otherwise = subBNAux xs ys ++ [x - y]
 
 
---   1 10 10 10
---   1  1 10 9
---   0  9  0  1
+----------------------- 2.6 -----------------------
+
+
+mulBN :: BigNumber -> BigNumber -> BigNumber
+mulBN a b = reverse (mulBNAux (reverse a) (reverse b))
+
+mulBNAux :: BigNumber -> BigNumber -> BigNumber
+mulBNAux [] [] = []
+mulBNAux xs [] = []
+mulBNAux [] ys = []
+mulBNAux (x:xs) (y:ys) = reverse (somaBNAux (mulLineBN y (x:xs) 0) (addHeaderZerosBN 1 (mulBNAux (x:xs) ys)) 0)
+
+mulLineBN :: Int -> BigNumber -> Int -> BigNumber
+mulLineBN _ [] 0 = []
+mulLineBN _ [] carry = [carry]
+mulLineBN x (y:ys) carry = ((x * y + carry) `mod` 10) : mulLineBN x ys ((x * y + carry) `div` 10)
