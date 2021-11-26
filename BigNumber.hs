@@ -9,26 +9,16 @@ type BigNumber = [Int]
 ----------------------- 2.2 -----------------------
 
 scanner :: String -> BigNumber
-scanner s = if head s == '-' then [- digitToInt x | x <- take 1 s'] ++ [digitToInt x | x <- tail s']
-            else [digitToInt x | x <- s]
-            where s' = tail s
-
-scanner' :: String -> BigNumber
-scanner' []         = []
-scanner' [a]        = [read [a] :: Int]
-scanner' (a:b:cs)   | a == '-'  = (- read [b] :: Int) : [read [x] :: Int | x <- cs]
+scanner []         = []
+scanner [a]        = [read [a] :: Int]
+scanner (a:b:cs)   | a == '-'  = (- read [b] :: Int) : [read [x] :: Int | x <- cs]
                     | otherwise = [read [x] :: Int | x <- a:b:cs]
 
 ----------------------- 2.3 -----------------------
 
 output :: BigNumber -> String
-output bignumber = if head bignumber < 0 then "-" ++ bignumber'
-                   else [intToDigit x | x <- bignumber]
-                   where bignumber' = [intToDigit (abs x) | x <- bignumber]
-
-output' :: BigNumber -> String
-output' [] = []
-output' (x:xs)  | x < 0 = '-' : bignumber
+output [] = []
+output (x:xs)  | x < 0 = '-' : bignumber
                 | otherwise = bignumber
                 where bignumber = foldr (\a b -> show (abs a) ++ b) [] (x:xs)
 
@@ -63,3 +53,30 @@ somaBnAux [] [] carry         = [carry]
 somaBnAux [] (b:bs) carry     = somaBnAux [] bs ((b + carry) `div` 10) ++ [(b + carry) `mod` 10]
 somaBnAux (a:as) [] carry     = somaBnAux as [] ((a + carry) `div` 10) ++ [(a + carry) `mod` 10]
 somaBnAux (a:as) (b:bs) carry = somaBnAux as bs ((a + b + carry) `div` 10) ++ [(a + b + carry) `mod` 10]
+
+----------------------- 2.5 -----------------------
+
+toggleSignalBn :: BigNumber -> BigNumber
+toggleSignalBn [] = []
+toggleSignalBn (x:xs) = (-x):xs
+
+ascendingBn :: BigNumber -> BigNumber -> (BigNumber, BigNumber)
+ascendingBn [] [] = ([], [])
+ascendingBn (x:xs) [] = (x:xs, [])
+ascendingBn [] (y:ys) = (y:ys, [])
+ascendingBn (x:xs) (y:ys)   | x < 0 && y > 0 = (x:xs, y:ys)
+                            | x > 0 && y < 0 = (y:ys, x:xs)
+                            | length (x:xs) < length (y:ys) = (x:xs, y:ys)
+                            | length (x:xs) > length (y:ys) = (y:ys, x:xs)
+                            | otherwise = ascendingBnAux (x:xs) (y:ys)
+
+ascendingBnAux :: BigNumber -> BigNumber -> (BigNumber, BigNumber)
+ascendingBnAux [] [] = ([], [])
+ascendingBnAux (x:xs) [] = (x:xs, [])
+ascendingBnAux [] (y:ys) = (y:ys, [])
+ascendingBnAux (x:xs) (y:ys)    | x < y = (x:xs, y:ys)
+                                | x > y = (y:ys, x:xs)
+                                | otherwise = (x : fst t, y : snd t)
+                                where t = ascendingBnAux xs ys
+
+--subBn :: BigNumber -> BigNumber -> BigNumber

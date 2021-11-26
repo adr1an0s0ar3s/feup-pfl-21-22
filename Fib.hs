@@ -1,3 +1,5 @@
+import BigNumber
+
 ----------------------- 1.1 -----------------------
 
 fibRec :: (Integral a) => a -> a
@@ -22,3 +24,10 @@ fibListaInfinita x = fib !! fromIntegral x
 
 fib :: (Integral a) => [a]
 fib = 0 : 1 : [n | x <- [2..], let n = fib !! (x-1) + fib !! (x-2)]
+
+----------------------- 3.0 -----------------------
+
+fibRecBN :: BigNumber -> BigNumber
+fibRecBN [0] = [0]
+fibRecBN [1] = [1]
+fibRecBN x = fibRec (subBN x [1]) + fibRec (subBN x [2])
