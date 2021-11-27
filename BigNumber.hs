@@ -9,9 +9,6 @@ import Data.Char
 addHeaderZerosBN :: Int -> BigNumber -> BigNumber
 addHeaderZerosBN x bn = [0 | _ <- [1..x]] ++ bn
 
-addFooterZerosBN :: Int -> BigNumber -> BigNumber
-addFooterZerosBN x bn = bn ++ [0 | _ <- [1..x]]
-
 removeHeaderZerosBN :: BigNumber -> BigNumber
 removeHeaderZerosBN [] = []
 removeHeaderZerosBN (x:xs) | x /= 0 = x:xs
@@ -24,8 +21,10 @@ toggleSignalBN (x:xs)   | x == 0 = x : toggleSignalBN xs
 
 greaterThanBN :: BigNumber -> BigNumber -> Bool
 greaterThanBN [] [] = False
-greaterThanBN xs [] = True
-greaterThanBN [] ys = False
+greaterThanBN (x:xs) [] | x < 0 = False
+                        | otherwise = True
+greaterThanBN [] (y:ys) | y < 0 = True
+                        | otherwise = False
 greaterThanBN (x:xs) (y:ys) | x < 0 && y < 0 = toggleSignalBN bn1 < toggleSignalBN bn2
                             | otherwise = bn1 > bn2
                             where bn1 = addHeaderZerosBN (length (y:ys) - length (x:xs)) (x:xs)
@@ -104,9 +103,14 @@ subBNAux (x:xs) (y:ys)  | x < y = subBNAux xs ((head ys + 1) : tail ys) ++ [x + 
 
 ----------------------- 2.6 -----------------------
 
-
 mulBN :: BigNumber -> BigNumber -> BigNumber
-mulBN a b = reverse (mulBNAux (reverse a) (reverse b))
+mulBN [] [] = []
+mulBN xs [] = []
+mulBN [] ys = []
+mulBN (x:xs) (y:ys) | x < 0 && y > 0 = toggleSignalBN (reverse (mulBNAux (reverse (toggleSignalBN (x:xs))) (reverse (y:ys))))
+                    | x > 0 && y < 0 = toggleSignalBN (reverse (mulBNAux (reverse (x:xs)) (reverse (toggleSignalBN (y:ys)))))
+                    | x < 0 && y < 0 = reverse (mulBNAux (reverse (toggleSignalBN (x:xs))) (reverse (toggleSignalBN (y:ys))))
+                    | otherwise = reverse (mulBNAux (reverse (x:xs)) (reverse (y:ys)))
 
 mulBNAux :: BigNumber -> BigNumber -> BigNumber
 mulBNAux [] [] = []
@@ -118,3 +122,26 @@ mulLineBN :: Int -> BigNumber -> Int -> BigNumber
 mulLineBN _ [] 0 = []
 mulLineBN _ [] carry = [carry]
 mulLineBN x (y:ys) carry = ((x * y + carry) `mod` 10) : mulLineBN x ys ((x * y + carry) `div` 10)
+
+
+----------------------- 2.7 -----------------------
+
+
+divBN :: BigNumber -> BigNumber -> (BigNumber, BigNumber)
+divBN (x:xs) (y:ys) | (x:xs) == (y:ys) = ([1], [])
+                    | otherwise = divBNAux (x:xs) (y:ys)
+
+divBNAux :: BigNumber -> BigNumber -> (BigNumber, BigNumber)
+divBNAux (x:xs) (y:ys) | x > 0 && y > 0 = (fst resultBothPos, subBN (x:xs) (snd resultBothPos))
+                       | x < 0 && y > 0 = (toggleSignalBN (fst resultBothPos), subBN (x:xs) (toggleSignalBN (snd resultBothPos)))
+                       | x < 0 && y < 0 = (fst resultBothNeg, subBN (x:xs) (snd resultBothNeg))
+                       | x > 0 && y < 0 = (toggleSignalBN (fst resultBothNeg), subBN (x:xs) (toggleSignalBN (snd resultBothNeg)))
+                       where resultBothNeg = head [(i, a) | (i, a) <- zip [scanner (show b) | b <- [1..]] [mulBN (y:ys) (scanner (show b)) | b <- [1..]], a == (x:xs) || greaterThanBN a (x:xs)]
+                             resultBothPos = head [(i, a) | (i, a) <- zip [scanner (show b) | b <- [1..]] [mulBN (y:ys) (scanner (show b)) | b <- [1..]], a == (x:xs) || greaterThanBN (somaBN a (y:ys)) (x:xs)]
+                        
+
+
+-- head [(i, a) | (i, a) <- zip [1,-1..] [mulBN (y:ys) (scanner (show b)) | b <- [1,-1..]], a == (x:xs) || greaterThanBN a (x:xs)]
+-- D = Q * d + R
+-- Q = (D - R) / d
+-- R = D - Q * d
