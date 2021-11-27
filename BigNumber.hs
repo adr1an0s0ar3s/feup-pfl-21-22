@@ -129,19 +129,9 @@ mulLineBN x (y:ys) carry = ((x * y + carry) `mod` 10) : mulLineBN x ys ((x * y +
 
 divBN :: BigNumber -> BigNumber -> (BigNumber, BigNumber)
 divBN (x:xs) (y:ys) | (x:xs) == (y:ys) = ([1], [])
+                    | not (greaterThanBN (x:xs) (y:ys)) = ([], x:xs)
                     | otherwise = divBNAux (x:xs) (y:ys)
 
 divBNAux :: BigNumber -> BigNumber -> (BigNumber, BigNumber)
-divBNAux (x:xs) (y:ys) | x > 0 && y > 0 = (fst resultBothPos, subBN (x:xs) (snd resultBothPos))
-                       | x < 0 && y > 0 = (toggleSignalBN (fst resultBothPos), subBN (x:xs) (toggleSignalBN (snd resultBothPos)))
-                       | x < 0 && y < 0 = (fst resultBothNeg, subBN (x:xs) (snd resultBothNeg))
-                       | x > 0 && y < 0 = (toggleSignalBN (fst resultBothNeg), subBN (x:xs) (toggleSignalBN (snd resultBothNeg)))
-                       where resultBothNeg = head [(i, a) | (i, a) <- zip [scanner (show b) | b <- [1..]] [mulBN (y:ys) (scanner (show b)) | b <- [1..]], a == (x:xs) || greaterThanBN a (x:xs)]
-                             resultBothPos = head [(i, a) | (i, a) <- zip [scanner (show b) | b <- [1..]] [mulBN (y:ys) (scanner (show b)) | b <- [1..]], a == (x:xs) || greaterThanBN (somaBN a (y:ys)) (x:xs)]
-                        
-
-
--- head [(i, a) | (i, a) <- zip [1,-1..] [mulBN (y:ys) (scanner (show b)) | b <- [1,-1..]], a == (x:xs) || greaterThanBN a (x:xs)]
--- D = Q * d + R
--- Q = (D - R) / d
--- R = D - Q * d
+divBNAux (x:xs) (y:ys)  = (fst resultBothPos, subBN (x:xs) (snd resultBothPos))
+                          where resultBothPos = head [(i, a) | (i, a) <- zip [scanner (show b) | b <- [1..]] [mulBN (y:ys) (scanner (show b)) | b <- [1..]], a == (x:xs) || greaterThanBN (somaBN a (y:ys)) (x:xs)]

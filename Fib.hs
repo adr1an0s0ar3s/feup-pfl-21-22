@@ -28,4 +28,6 @@ fib = 0 : 1 : [n | x <- [2..], let n = fib !! (x-1) + fib !! (x-2)]
 ----------------------- 3.0 -----------------------
 
 fibRecBN :: BigNumber -> BigNumber
-fibRecBn 
+fibRecBN [] = []
+fibRecBN [1] = [1]
+fibRecBN bn = somaBN (fibRecBN (subBN bn [1])) (fibRecBN (subBN bn [2]))
