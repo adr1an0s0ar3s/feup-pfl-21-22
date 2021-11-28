@@ -34,13 +34,16 @@ fib :: (Integral a) => [a]
 fib = scanl (+) 0 (1 : fib)
 
 
------------------------ 3.0 -----------------------
+----------------------- 3.1 -----------------------
 
 
 fibRecBN :: BigNumber -> BigNumber
 fibRecBN [] = []
 fibRecBN [1] = [1]
 fibRecBN x = somaBN (fibRecBN (subBN x [1])) (fibRecBN (subBN x [2]))
+
+
+----------------------- 3.2 -----------------------
 
 
 fibListaBN :: BigNumber -> BigNumber 
@@ -51,6 +54,9 @@ fibListaBNAux :: BigNumber -> (BigNumber, BigNumber) -> BigNumber
 fibListaBNAux [] (x,y) = x
 fibListaBNAux [1] (x,y) = y
 fibListaBNAux a (x,y) = fibListaBNAux (subBN a [1]) (y, somaBN x y)
+
+
+----------------------- 3.3 -----------------------
 
 
 --fibListaInfinitaBN :: BigNumber -> BigNumber
