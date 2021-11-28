@@ -25,8 +25,6 @@ ghci> fibRec 1
 ```
 Como podemos observar, todos estes resultados estão de acordo com a série de Fibonacci.
 
----
-
 ## fibLista
 
 ```
@@ -55,14 +53,11 @@ ghci> fibLista 0
 
 Como podemos observar, todos estes resultados estão de acordo com a sequência de Fibonacci.
 
----
-
 ## fibListaInfinita
 
 ```
 fibListaInfinita :: (Integral a) => a -> a
 fibListaInfinita x = fib !! fromIntegral x
-
 
 fib :: (Integral a) => [a]
 fib = scanl (+) 0 (1 : fib)
@@ -70,13 +65,13 @@ fib = scanl (+) 0 (1 : fib)
 
 A função fibListaInfinita retorna o elemento de índice fornecido da sequência de Fibonacci, através da criação de uma lista infinita com o scanl. O scanl irá somar o segundo argumento, chamár-lhe-emos o acumulador, com o primeiro elemento da lista. O resultado dessa operação irá ser colocada no acumulador, que será somada ao segundo elemento da lista, etc... Somando a lista Fibs com ela própria mas com um 1 inicial produz a lista de Fibonacci.
 
-| Acumulador | Elemento da Lista | Resultado (Acumulador + Elemento) |
-| ---------- | ----------------- | --------------------------------- |
-| 0          | 1                 | 1                                 |
-| 1          | 0                 | 1                                 |
-| 1          | 1                 | 2                                 |
-| 2          | 1                 | 3                                 |
-| 3          | 2                 | 5                                 |
+| Iteração | Acumulador | Elemento da Lista | Resultado (Acumulador + Elemento) |
+| :------: | :--------: | :---------------: | :-------------------------------: |
+|    1     |     0      |         1         |                 1                 |
+|    2     |     1      |         0         |                 1                 |
+|    3     |     1      |         1         |                 2                 |
+|    4     |     2      |         1         |                 3                 |
+|    5     |     3      |         2         |                 5                 |
 
 ### Testes
 
@@ -90,8 +85,6 @@ ghci> fibListaInfinita 7
 ```
 
 Como podemos observar, todos estes resultados estão de acordo com a sequência de Fibonacci.
-
----
 
 # Módulo Fib.hs com Big-Numbers
 
@@ -119,14 +112,11 @@ ghci> fibRecBN [1]
 
 Como podemos observar, os resultados estão de acordo tanto com a sequência de Fibonacci como com a implementação da mesma função sem os Big-Numbers.
 
----
-
 ## fibListaBN
 
 ```
 fibListaBN :: BigNumber -> BigNumber 
 fibListaBN x = fibListaBNAux x ([],[1])
-
 
 fibListaBNAux :: BigNumber -> (BigNumber, BigNumber) -> BigNumber
 fibListaBNAux [] (x,y) = x
@@ -150,8 +140,6 @@ ghci> fibLista []
 ```
 
 Como podemos observar, os resultados estão de acordo tanto com a sequência de Fibonacci como com a implementação da mesma função sem os Big-Numbers.
-
----
 
 ## fibListaInfinitaBN
 
@@ -196,8 +184,6 @@ Números negativos são representados em Big-Number apenas com o primeiro dígit
 
 O número 0 é representado em Big-Number como [] (lista vazia).
 
----
-
 ## scanner
 
 ```
@@ -227,8 +213,6 @@ ghci> scanner "-00011"
 ```
 
 Como podemos observar, a função comporta-se como seria esperado.
-
----
 
 ## output
 
@@ -303,8 +287,6 @@ ghci> somaBN [-1,2,3] [4,9]
 
 Como podemos observar, os resultados obtidos são os esperados.
 
----
-
 ## subBN
 
 ```
@@ -355,8 +337,6 @@ ghci> subBN [-1,2,3] [-4,9]
 ```
 
 Como podemos observar, os resultados são os esperados.
-
----
 
 ## mulBN
 
@@ -411,8 +391,6 @@ ghci> mulBN [5] [5]
 
 Como podemos observar, os resultados são os esperados.
 
----
-
 ## divBN
 
 ```
@@ -435,9 +413,9 @@ A função divBN efetua a divisão entre dois Big-Numbers positivos, retornando 
 
 A função divBN vai utilizar a função divBNAux, que, por sua vez, vai utilizar a função slowDivBN. A função slowDivBN resolve o problema indicado, retornando o resultado correto, no entanto, como o nome indica, é lenta, já que esta procura quantas vezes o segundo argumento consegue encaixar-se no primeiro argumento (utilizando a função timeTableBN). Para optimizar os cálculos fazemos uma divisão dígito a dígito na função divBNAux.
 
-A função divBNAux vai realizar vários cálculos intermédios ao longo do seu primeiro argumento, o dividendo, dígito a dígito. Procura dividir o primeiro dígito pelo divisor (segundo argumento) e guarda o resto desta divisão num dos seus dois acumuladores, neste caso o r, concatenado com o próximo dígito do dividendo, e guarda o quociente da divisão anterior ([] sendo a primeira iteração) concatenado com o quociente desta divisão no outro acumulador, o q. Posteriormente chamamos esta função recursivamente com o resto do dividendo até que o dividendo é esgotado.
+A função divBNAux vai realizar vários cálculos intermédios ao longo do seu primeiro argumento, o dividendo, dígito a dígito. Procura dividir o primeiro dígito do dividendo pelo divisor (segundo argumento) e guarda o resto desta divisão num dos seus dois acumuladores, neste caso o r, concatenado com o próximo dígito do dividendo, e guarda o quociente da divisão anterior ([] sendo a primeira iteração) concatenado com o quociente desta divisão no outro acumulador, o q. Posteriormente chamamos esta função recursivamente com o resto do dividendo até que o dividendo seja esgotado.
 
--- TODO
+Dado que a divisão pode resultar num quociente 0 e a nossa representação de 0 ser [], de modo a que o quociente tenha 0's a meio tivemos que, provisoriamente, representar o 0 por [0] na função slowDivBN, o que traduz-se, também, na utilização da função removeHeaderZerosBN em divBN.
 
 ### Testes
 
@@ -451,8 +429,6 @@ ghci> divBN [4,9] [1,2,3]
 ```
 
 Como podemos observar, os resultados são os esperados.
-
----
 
 ## safeDivBN
 
@@ -541,7 +517,33 @@ ghci> take 5 (timeTableBN [2])
 [([],[]),([1],[2]),([2],[4]),([3],[6]),([4],[8])]
 ```
 
-# Grupo
+# Alínea 4
+
+| Tipo      | Mínimo | Máximo |
+| --------- | ------ | ------ |
+| Int *     | -2^29  | 2^29-1 |
+| Integer   | - Inf  | + Inf  |
+| BigNumber | - Inf  | + Inf  |
+
+\* De acordo com a documentação de Haskell o tipo Int tem limite inferior e superior indicados na tabela, no entanto, como podemos ver pelo bloco de código abaixo, dado que o código foi compilado numa arquitetura 64 bits, os nossos limites são, realmente, `[-2^63, -2^63-1]`.
+
+```
+ghci> (minBound, maxBound) :: (Int, Int)
+(-9223372036854775808,9223372036854775807)
+```
+
+Deste modo, a implementação de todas as funções que trabalham com Int são viáveis apenas até a um argumento igual ou inferior a 92, pois o valor do número de Fibonacci de índice 93 ultrapassa o limite representável por esse tipo, como podemos ver abaixo.
+
+```
+ghci> head (filter (\x -> snd x < 0) [(x, fibLista x::Int) | x <- [0..]])
+(93,-6246583658587674878)
+```
+
+A implementação das funções fibLista e fibListaInfinita aplicadas a Integers estão restringidas pelo operador !! que recebe um número do tipo Int como índice. Deste modo o argumento destas funções tem um limite superior de 2^63-1, após esse valor ocorrerá overflow de índices, inviabilizando os resultados. A função fibRec aplicada a Integer não é afetada, pois esta não utiliza o operador !!, e, deste modo, o seu argumento pode, hipoteticamente, ser infinito, sendo este apenas restringido pela memória da própria máquina.
+
+Na implementação das funções aplicadas a BigNumbers dado que não utilizam o operador !! e este tipo não ter limites, em teoria, conseguem representar números de Fibonacci infinitos (enquanto a máquina aguentar).
+
+# Grupo G2_07
 
 - Adriano Soares <up201904873@up.pt>
 - Vasco Alves <up201808031@up.pt>
