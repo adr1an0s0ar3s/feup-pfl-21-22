@@ -23,7 +23,7 @@ fibLista x = fibListaAux x 2 [0,1] !! fromIntegral x
 -- | A função auxilia a função fibLista, retorna uma lista de números de Fibonacci até ao índice que recebe por argumento.
 -- Recebe como argumentos o índice, o número de elementos já calculados e uma lista com elementos já calculados (deve ser inicializada com: índice 2 [0,1])
 fibListaAux :: (Integral a) => a -> a -> [a] -> [a]
-fibListaAux x n acc | x == (n-1) = acc
+fibListaAux x n acc | (x+1) == n = acc
                     | otherwise = fibListaAux x (n+1) (acc ++ [acc !! fromIntegral (n-2) + acc !! fromIntegral (n-1)])
 
 

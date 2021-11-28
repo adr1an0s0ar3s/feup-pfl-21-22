@@ -11,7 +11,7 @@ fibRec 1 = 1
 fibRec x = fibRec (x-2) + fibRec (x-1)
 ```
 
-A função fibRec retorna o elemento de índice fornecido da lista de Fibonacci, através de uma implementação recursiva, chamando a própria para somar os dois elementos anteriores, parando apenas quando chegar a um dos casos base.
+A função **fibRec** retorna o elemento de índice fornecido da lista de Fibonacci através de uma implementação recursiva, chamando a própria para somar os dois elementos anteriores, parando apenas quando chegar a um dos casos base.
 
 ### Testes
 
@@ -34,11 +34,11 @@ fibLista 1 = 1
 fibLista x = fibListaAux x 2 [0,1] !! fromIntegral x
 
 fibListaAux :: (Integral a) => a -> a -> [a] -> [a]
-fibListaAux x n acc | x == (n-1) = acc
+fibListaAux x n acc | (x+1) == n = acc
                     | otherwise = fibListaAux x (n+1) (acc ++ [acc !! fromIntegral (n-2) + acc !! fromIntegral (n-1)])
 ```
 
-A função fibLista retorna o elemento de índice fornecido da sequência de Fibonacci, utilizando programação dinâmica para pré-calcular uma lista de resultados parciais. Enquanto o número de elementos da lista não for igual ao índice - 1 fornecido como argumento iremos iterar a lista criando um novo elemento somando os dois anteriores.
+A função **fibLista** retorna o elemento de índice fornecido da sequência de Fibonacci utilizando programação dinâmica para pré-calcular uma lista de resultados parciais. Enquanto o número de elementos da lista não for igual ao índice + 1 fornecido como argumento iremos iterar a lista criando um novo elemento somando os dois anteriores.
 
 ### Testes
 
@@ -63,7 +63,7 @@ fib :: (Integral a) => [a]
 fib = scanl (+) 0 (1 : fib)
 ```
 
-A função fibListaInfinita retorna o elemento de índice fornecido da sequência de Fibonacci, através da criação de uma lista infinita com o scanl. O scanl irá somar o segundo argumento, chamár-lhe-emos o acumulador, com o primeiro elemento da lista. O resultado dessa operação irá ser colocada no acumulador, que será somada ao segundo elemento da lista, etc... Somando a lista Fibs com ela própria mas com um 1 inicial produz a lista de Fibonacci.
+A função **fibListaInfinita** retorna o elemento de índice fornecido da sequência de Fibonacci através da criação de uma lista infinita com a utilização da função **scanl** do prelude. O **scanl** irá somar o segundo argumento, o acumulador, com o primeiro elemento da lista. O resultado dessa operação irá ser colocada no acumulador, que será então somada ao segundo elemento da lista, etc... Somando a lista Fibs com ela própria concatenada com um 1 inicial produz a lista de Fibonacci.
 
 | Iteração | Acumulador | Elemento da Lista | Resultado (Acumulador + Elemento) |
 | :------: | :--------: | :---------------: | :-------------------------------: |
@@ -86,7 +86,7 @@ ghci> fibListaInfinita 7
 
 Como podemos observar, todos estes resultados estão de acordo com a sequência de Fibonacci.
 
-# Módulo Fib.hs com Big-Numbers
+# Módulo Fib.hs com BigNumbers
 
 ## fibRecBN
 
@@ -97,7 +97,7 @@ fibRecBN [1] = [1]
 fibRecBN x = somaBN (fibRecBN (subBN x [1])) (fibRecBN (subBN x [2]))
 ```
 
-A função fibRecBN segue a mesma lógica da função fibRec, mas implementada com Big-Numbers, sendo assim necessário utilizar as operações de soma e subtração entre Big-Number (somaBN e subBn, respetivamente). É utilizada uma implementação recursiva para somar os dois elementos anteriores e parar quando chegar a um dos casos base.
+A função **fibRecBN** segue a mesma lógica da função **fibRec** mas implementada com BigNumbers, sendo assim necessário utilizar as operações de soma e subtração entre BigNumber (**somaBN** e **subBn**, respetivamente). É utilizada uma implementação recursiva para somar os dois elementos anteriores e parar quando chegar a um dos casos base.
 
 ### Testes
 
@@ -110,7 +110,7 @@ ghci> fibRecBN [1]
 [1]
 ```
 
-Como podemos observar, os resultados estão de acordo tanto com a sequência de Fibonacci como com a implementação da mesma função sem os Big-Numbers.
+Como podemos observar, os resultados estão de acordo tanto com a sequência de Fibonacci como com a implementação da mesma função sem os BigNumbers.
 
 ## fibListaBN
 
@@ -124,9 +124,9 @@ fibListaBNAux [1] (x,y) = y
 fibListaBNAux a (x,y) = fibListaBNAux (subBN a [1]) (y, somaBN x y)
 ```
 
-A função fibListaBN utiliza uma abordagem de programação dinâmica semelhante da fibLista, no entanto, ao invés de armazenar uma lista de resultados parciais, guardamos apenas os dois valores anteriores. A utilização do operador !! é ímpossível sem a conversão de Big-Number para inteiro, daí optarmos por esta abordagem como alternativa.
+A função **fibListaBN** utiliza uma abordagem de programação dinâmica semelhante da **fibLista**, no entanto, ao invés de armazenar uma lista de resultados parciais, guardamos apenas os dois valores anteriores. A utilização do operador !! é ímpossível sem a conversão de BigNumber para inteiro, daí optarmos por esta abordagem como alternativa.
 
-**NOTA**: Seria possível associar um índice Big-Number a cada valor da lista de números Fibonacci com um tuplo (Índice, Número) e comparar posteriormente o índice, mas esta implementação seria dispendiosa em termos de memória e performance, daí optarmos por esta abordagem.
+**NOTA**: Seria possível associar um índice BigNumber a cada valor da lista de números Fibonacci com um tuplo (Índice, Número) e comparar posteriormente o índice, mas esta implementação seria dispendiosa em termos de memória e performance, daí optarmos por esta abordagem.
 
 ### Testes
 
@@ -139,7 +139,7 @@ ghci> fibLista []
 []
 ```
 
-Como podemos observar, os resultados estão de acordo tanto com a sequência de Fibonacci como com a implementação da mesma função sem os Big-Numbers.
+Como podemos observar, os resultados estão de acordo tanto com a sequência de Fibonacci como com a implementação da mesma função sem os BigNumbers.
 
 ## fibListaInfinitaBN
 
@@ -155,7 +155,7 @@ fibBN :: [BigNumber]
 fibBN = scanl somaBN [] ([1] : fibBN)
 ```
 
-A função fibListaInfinitaBN utiliza a mesma lista infinita da função fibLista adaptada para Big-Numbers, no entanto, dado que não é possível a utilização do operador !! utilizamos uma função auxiliar para iterar a lista infinita através da chamada recursiva da função tail.
+A função **fibListaInfinitaBN** utiliza a mesma lista infinita da função **fibListaInfinita** adaptada para BigNumbers, no entanto, dado que não é possível a utilização do operador !! utilizamos uma função auxiliar para iterar a lista infinita através da chamada recursiva da função **tail** do prelude.
 
 ### Testes
 
@@ -170,19 +170,19 @@ ghci> fibListaInfinitaBN []
 []
 ```
 
-Como podemos observar, os resultados estão de acordo tanto com a sequência de Fibonacci como com a implementação da mesma função sem os Big-Numbers.
+Como podemos observar, os resultados estão de acordo tanto com a sequência de Fibonacci como com a implementação da mesma função sem os BigNumbers.
 
 # Módulo BigNumber.h
 
-A definição de Big-Number é:
+A definição de BigNumber é:
 
 ```
 type BigNumber = [Int]
 ```
 
-Números negativos são representados em Big-Number apenas com o primeiro dígito a negativo. Exemplo: -123 corresponde ao Big-Number [-1,2,3].
+Números negativos são representados em BigNumber apenas com o primeiro dígito a negativo. Exemplo: `-123` corresponde ao BigNumber `[-1,2,3]`.
 
-O número 0 é representado em Big-Number como [] (lista vazia).
+O número `0` é representado em BigNumber como `[]` (lista vazia).
 
 ## scanner
 
@@ -195,7 +195,7 @@ scanner (a:b:cs) | a == '-'  = toggleSignalBN (removeHeaderZerosBN [read [x] :: 
                  | otherwise = removeHeaderZerosBN [read [x] :: Int | x <- a:b:cs]
 ```
 
-A função scanner pega num número em formato de string e devolve esse mesmo número na forma de um Big-Number. Como uma string é uma lista de caracteres, basta percorrer a lista e converter os caracteres para inteiro, utilizando a função read :: Int. Se o primeiro elemento da lista for o sinal negativo ('-'), é efetuada a conversão da restante lista e é negado o seu primeiro elemento.
+A função **scanner** pega num número em formato de String e devolve esse mesmo número na forma de um BigNumber. Como uma String é uma lista de caracteres, basta percorrer a lista e converter os caracteres para inteiro, utilizando a função **read :: Int** do prelude. Se o primeiro elemento da lista for o sinal negativo ('-'), é efetuada a conversão da restante lista e é negado o seu primeiro elemento.
 
 ### Testes
 
@@ -224,7 +224,7 @@ output (x:xs) | x < 0 = '-' : bignumber
               where bignumber = foldr (\a b -> show (abs a) ++ b) [] (x:xs)
 ```
 
-A função output faz o inverso da função scanner, ou seja, recebe um Big-Number e retorna o mesmo em formato de String. Dado que uma String é uma lista de caracteres, basta fazer conversão do tipo Int para Char, utilizando a função show, percorrendo a lista com foldr. Se o primeiro elemento do Big-Number for negativo, é só adicionar um '-' à String resultado.
+A função **output** faz o inverso da função **scanner**, ou seja, recebe um BigNumber e retorna o mesmo em formato de String. Dado que uma String é uma lista de caracteres, basta fazer conversão do tipo Int para Char, utilizando a função **show** do prelude, percorrendo a lista com **foldr** também disponível no **prelude**. Se o primeiro elemento do BigNumber for negativo, é só adicionar um '-' à String resultado.
 
 ### Testes
 
@@ -264,13 +264,13 @@ somaBNAux (a:as) [] carry     = somaBNAux as [] ((a + carry) `div` 10) ++ [(a + 
 somaBNAux (a:as) (b:bs) carry = somaBNAux as bs ((a + b + carry) `div` 10) ++ [(a + b + carry) `mod` 10]
 ```
 
-A função somaBN implementa a soma entre dois Big-Numbers, retornando o Big-Number resultado. 
+A função **somaBN** implementa a soma entre dois BigNumbers, retornando o BigNumber resultante. 
 
-Para a soma com dois Big-Numbers positivos, foi utilizada uma função auxiliar que recebe como argumentos os dois Big-Numbers revertidos (para facilitar a implementação) e também um inteiro que representa o carry (este ou será 0 ou 1, daí não ser ele próprio um Big-Number). Assim, soma-se elemento com elemento os dois Big-Numbers, a divisão por 10 do resultado dessa soma é guardada para o retorno e chama-se recursivamente a mesma função com o restante dos dois Big-Numbers com o carry cálculado através do resto da divisão do resultado da soma por 10.
+Para a soma com dois BigNumbers positivos, foi utilizada uma função auxiliar **somaBNAux** que recebe como argumentos os dois BigNumbers revertidos (para facilitar a implementação) e também um inteiro que representa o carry (este ou será 0 ou 1, daí não ser ele próprio um BigNumber). Assim, soma-se elemento com elemento os dois BigNumbers, a divisão por 10 do resultado dessa soma é guardada para o retorno e chama-se recursivamente a mesma função com o restante dos dois BigNumbers com o carry calculado através do resto da divisão do resultado da soma por 10.
 
-Para a soma com dois Big-Numbers negativos é efetuada a mesma estratégia: negando os dois Big-Numbers para obtermos uma soma entre dois positivos e depois negar o resultado final. É utilizada a função auxiliar toggleSignalBN, que altera o sinal de um Big-Number de positivo para negativo ou vice-versa.
+Para a soma com dois BigNumbers negativos é efetuada a seguinte estratégia: negando os dois BigNumbers para obtermos uma soma entre dois positivos e depois negar o resultado final. É utilizada a função auxiliar **toggleSignalBN**, que altera o sinal de um BigNumber de positivo para negativo ou vice-versa.
 
-Para a soma de um Big-Number positivo com um negativo, é utilizada a função que implementa a subtração de dois Big-Numbers, a subBN, cujo funcionamento será explicado no seu tópico. Assim, transforma-se a soma de um positivo com um negativo numa subtração entre dois positivos.
+Para a soma de um BigNumber positivo com um negativo, é utilizada a função que implementa a subtração de dois BigNumbers, a **subBN**, cujo funcionamento será explicado no seu tópico. Assim, transforma-se a soma de um positivo com um negativo numa subtração entre dois positivos.
 
 ### Testes
 
@@ -312,16 +312,15 @@ subBNAux (x:xs) (y:ys) | x < y = subBNAux xs ((head ys + 1) : tail ys) ++ [x + 1
                        | otherwise = subBNAux xs ys ++ [x - y]
 ```
 
-A função subBN implementa a subtração entre dois Big-Numbers, retornando o Big-Number resultante. 
+A função **subBN** implementa a subtração entre dois BigNumbers, retornando o BigNumber resultante. 
 
-A função subBN em si faz o tratamento de sinais apenas, deixando o cálculo da subtração para a sua função auxiliar, subBNAux.
+A função **subBN** em si faz o tratamento de sinais apenas, deixando o cálculo da subtração para a sua função auxiliar, **subBNAux**. Aplicamos na função subBN a seguinte estratégia:
+- Caso apenas o primeiro número seja negativo iremos chamar a função **somaBN** com o seu absoluto e trocamos o sinal final;
+- Caso apenas o segundo número seja negativo iremos chamar a função **somaBN** com o seu absoluto;
+- Caso os dois números sejam negativos iremos chamar a função recursivamente com o absoluto dos dois números e pela ordem inversa dos argumentos;
+- Caso os dois números sejam positivos iremos verificar, primeiramente, qual o maior em valor absoluto, de seguida subtraímos o maior ao menor utilizando a função **subBNAux** (argumentos recebidos pela ordem inversa), e posteriormente colocamos o sinal do de maior valor absoluto.
 
-- Caso apenas o primeiro número seja negativo iremos chamar a função somaBN com o seu absoluto e trocamos o sinal final.
-- Caso apenas o segundo número seja negativo iremos chamar a função somaBN com o seu absoluto.
-- Caso os dois números sejam negativos iremos chamar a função recursivamente com o absoluto dos dois números e pela ordem inversa dos argumentos.
-- Caso os dois números sejam positivos iremos verificar, primeiramente, qual o maior em valor absoluto, de seguida subtrair o maior ao menor utilizando a função subBNAux (argumentos recebidos pela ordem inversa), e posteriormente colocar o sinal do de maior valor absoluto.
-
-A função subBNAux subtrai dígito a dígito, do menos significativo para o mais significativo, verificando se o dígito do primeiro argumento é superior ao dígito do segundo argumento. Caso não seja, antes da subtração é feita a soma de 10 ao dígito do primeiro argumento e a soma de 1 ao dígito seguinte do segundo argumento.
+A função **subBNAux** subtrai dígito a dígito, do menos significativo para o mais significativo, verificando se o dígito do primeiro argumento é superior ao dígito do segundo argumento. Caso não seja, antes da subtração somamos 10 ao dígito do primeiro argumento e somamos 1 ao dígito seguinte do segundo argumento.
 
 ### Testes 
 
@@ -364,13 +363,13 @@ mulLineBN _ [] carry = [carry]
 mulLineBN x (y:ys) carry = ((x * y + carry) `mod` 10) : mulLineBN x ys ((x * y + carry) `div` 10)
 ```
 
-A função mulBN efetua a multiplicação entre dois Big-Numbers e dá o Big-Number resultante.
+A função **mulBN** efetua a multiplicação entre dois BigNumbers e retorna o BigNumber resultante.
 
-A mulBN apenas é responsável por organizar os Big-Numbers com os quais vai ser realizada a multiplicação, trocar os sinais (se necessário), e reverter os Big-Numbers de modo a facilitar os cálculos. A multiplicação em si é realizada pela função auxiliar mulBNAux, que por sua vez é auxiliada pela mulLineBN.
+A **mulBN** apenas é responsável por organizar os BigNumbers com os quais vai ser realizada a multiplicação, trocar os sinais (se necessário), e reverter os BigNumbers de modo a facilitar os cálculos. A multiplicação em si é realizada pela função auxiliar **mulBNAux**, que por sua vez é auxiliada pela **mulLineBN**.
 
-A função mulLineBn recebe um Int que corresponde ao dígito do fator pelo qual estamos a multiplicar o Big-Number, sendo este o segundo argumento, e o último argumento é o carry. Assim, é realizada a multiplicação entre dígitos e é verificado e lidado com o carry através da divisão por 10 e o seu resto (de forma semelhante à soma). A função é chamada recursivamente até percorrer todos os dígitos do Big-Number.
+A função **mulLineBn** recebe um Int que corresponde ao fator pelo qual estamos a multiplicar o BigNumber, sendo este o segundo argumento. Assim, é realizada a multiplicação entre dígitos e lidamos com o carry de forma semelhante à soma. A função é chamada recursivamente até percorrer todos os dígitos do BigNumber.
 
-A função mulBNAux é responsável por chamar a mulLineBN para cada dígito do segundo fator, e, posteriormente, somar as linhas depois de adicionado um shift à direita de um dígito a cada linha com o recurso da função addHeaderZerosBN, que coloca um número arbitrário de 0's à cabeça do seu argumento.
+A função **mulBNAux** é responsável por chamar a **mulLineBN** para cada dígito do segundo fator, e, posteriormente, somar as linhas depois de adicionado um shift à direita de um dígito a cada linha com o recurso da função **addHeaderZerosBN** (que coloca um número arbitrário de 0's à cabeça do seu argumento).
 
 ### Testes
 
@@ -409,13 +408,15 @@ slowDivBN xs ys = (if null (fst r) then [0] else fst r, subBN xs (snd r))
             where r = head (filter (\x -> greaterThanBN (somaBN (snd x) ys) xs) (timeTableBN ys))
 ```
 
-A função divBN efetua a divisão entre dois Big-Numbers positivos, retornando o resultado na forma (quociente, resto), também estes representados através de Big-Numbers.
+A função **divBN** efetua a divisão entre dois BigNumbers positivos, retornando o resultado na forma (quociente, resto), também estes representados através de BigNumbers.
 
-A função divBN vai utilizar a função divBNAux, que, por sua vez, vai utilizar a função slowDivBN. A função slowDivBN resolve o problema indicado, retornando o resultado correto, no entanto, como o nome indica, é lenta, já que esta procura quantas vezes o segundo argumento consegue encaixar-se no primeiro argumento (utilizando a função timeTableBN). Para optimizar os cálculos fazemos uma divisão dígito a dígito na função divBNAux.
+A função **divBN** vai utilizar a função **divBNAux**, que, por sua vez, vai utilizar a função **slowDivBN**.
 
-A função divBNAux vai realizar vários cálculos intermédios ao longo do seu primeiro argumento, o dividendo, dígito a dígito. Procura dividir o primeiro dígito do dividendo pelo divisor (segundo argumento) e guarda o resto desta divisão num dos seus dois acumuladores, neste caso o r, concatenado com o próximo dígito do dividendo, e guarda o quociente da divisão anterior ([] sendo a primeira iteração) concatenado com o quociente desta divisão no outro acumulador, o q. Posteriormente chamamos esta função recursivamente com o resto do dividendo até que o dividendo seja esgotado.
+A função **slowDivBN** determina a divisão entre dois BigNumbers positivos, no entanto, como o nome indica, é lenta, já que esta procura quantas vezes o segundo argumento consegue pertencer ao primeiro argumento (utilizando a função **timeTableBN**). Para optimizar os cálculos fazemos uma divisão dígito a dígito na função **divBNAux**.
 
-Dado que a divisão pode resultar num quociente 0 e a nossa representação de 0 ser [], de modo a que o quociente tenha 0's a meio tivemos que, provisoriamente, representar o 0 por [0] na função slowDivBN, o que traduz-se, também, na utilização da função removeHeaderZerosBN em divBN.
+A função **divBNAux** vai realizar vários cálculos intermédios ao longo do seu primeiro argumento, o dividendo, dígito a dígito. Procura dividir o primeiro dígito do dividendo pelo divisor (segundo argumento) e guarda o resto desta divisão num dos seus dois acumuladores, neste caso o r, concatenado com o próximo dígito do dividendo, e guarda o quociente da divisão anterior ([] sendo a primeira iteração) concatenado com o quociente desta divisão no outro acumulador, o q. Posteriormente chamamos esta função recursivamente com a cauda do dividendo até que o dividendo seja esgotado.
+
+Dado que a divisão pode resultar num quociente 0 e a nossa representação de 0 ser [], de modo a que o quociente tenha 0's a meio tivemos que, provisoriamente, representar o 0 por [0] na função slowDivBN, o que traduz-se, também, na utilização da função **removeHeaderZerosBN** em **divBN** de modo a não representar 0's no início do resultado.
 
 ### Testes
 
@@ -438,7 +439,7 @@ safeDivBN xs [] = Nothing
 safeDivBN xs ys = Just (divBN xs ys)
 ```
 
-A função safeDivBN realiza também a divisão, mas esta é capaz de detetar a divisão por zero em compile-time. Assim, são retornados monads do tipo Maybe: Nothing quando é efetuada uma divisão por zero e Just com o resultado da divisão caso não seja.
+A função **safeDivBN** realiza também a divisão, mas esta é capaz de detetar a divisão por zero em compile-time. Assim, são retornados monads do tipo Maybe: Nothing quando é efetuada uma divisão por zero e Just com o resultado da divisão caso não seja.
 
 ### Testes
 
@@ -460,7 +461,7 @@ addHeaderZerosBN :: Int -> BigNumber -> BigNumber
 addHeaderZerosBN x bn = [0 | _ <- [1..x]] ++ bn
 ```
 
-A função addHeaderZerosBN adiciona a quantidade indicada de 0's à cabeça de um Big-Number.
+A função **addHeaderZerosBN** adiciona a quantidade indicada de 0's à cabeça de um BigNumber.
 
 ## removeHeaderZerosBN
 
@@ -471,7 +472,7 @@ removeHeaderZerosBN (x:xs) | x /= 0 = x:xs
                            | otherwise = removeHeaderZerosBN xs
 ```
 
-A função removeHeaderZerosBN remove os 0's iniciais de um Big-Number.
+A função **removeHeaderZerosBN** remove os 0's iniciais de um BigNumber.
 
 ## toggleSignalBN
 
@@ -482,7 +483,7 @@ toggleSignalBN (x:xs) | x == 0 = x : toggleSignalBN xs
                       | otherwise = (-x):xs
 ```
 
-A função toggleSignalBN troca o sinal a um Big-Number.
+A função **toggleSignalBN** troca o sinal a um BigNumber.
 
 ## greaterThanBN
 
@@ -499,7 +500,7 @@ greaterThanBN (x:xs) (y:ys) | x < 0 && y < 0 = toggleSignalBN bn1 < toggleSignal
                                   bn2 = addHeaderZerosBN (length (x:xs) - length (y:ys)) (y:ys)
 ```
 
-A função greaterThanBN verifica se o Big-Number passado como primeiro argumento é maior do que o Big-Number passado como segundo argumento.
+A função **greaterThanBN** verifica se o BigNumber passado como primeiro argumento é maior do que o BigNumber passado como segundo argumento.
 
 ## timeTableBN
 
@@ -508,7 +509,7 @@ timeTableBN :: BigNumber -> [(BigNumber, BigNumber)]
 timeTableBN x = scanl (\a b -> (somaBN (fst a) [1], somaBN (snd a) b)) ([], []) [x | _ <- [1..]]
 ```
 
-A função timeTableBN retorna a tabuada do Big-Number passado como argumento, no formato [(Indice, Multiplicação)].
+A função **timeTableBN** retorna a tabuada do BigNumber passado como argumento, no formato [(Indice, Multiplicação)].
 
 Por exemplo:
 
@@ -539,9 +540,9 @@ ghci> head (filter (\x -> snd x < 0) [(x, fibLista x::Int) | x <- [0..]])
 (93,-6246583658587674878)
 ```
 
-A implementação das funções fibLista e fibListaInfinita aplicadas a Integers estão restringidas pelo operador !! que recebe um número do tipo Int como índice. Deste modo o argumento destas funções tem um limite superior de 2^63-1, após esse valor ocorrerá overflow de índices, inviabilizando os resultados. A função fibRec aplicada a Integer não é afetada, pois esta não utiliza o operador !!, e, deste modo, o seu argumento pode, hipoteticamente, ser infinito, sendo este apenas restringido pela memória da própria máquina.
+A implementação das funções **fibLista** e **fibListaInfinita** aplicadas a Integers estão restringidas pelo operador !! que recebe um número do tipo Int como índice. Deste modo o argumento destas funções tem um limite superior de 2^63-1, após esse valor ocorrerá overflow de índices, inviabilizando os resultados. A função **fibRec** aplicada a Integer não é afetada, pois esta não utiliza o operador !!, e, deste modo, o seu argumento pode, hipoteticamente, ser infinito, sendo este apenas restringido pela memória da própria máquina.
 
-Na implementação das funções aplicadas a BigNumbers dado que não utilizam o operador !! e este tipo não ter limites, em teoria, conseguem representar números de Fibonacci infinitos (enquanto a máquina aguentar).
+Na implementação das funções aplicadas a BigNumbers dado que não utilizam o operador !! e este tipo não ter limites, em teoria, conseguem representar números de Fibonacci infinitos, enquanto a memória da própria máquina suportar.
 
 # Grupo G2_07
 
