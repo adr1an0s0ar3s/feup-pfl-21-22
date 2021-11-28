@@ -414,9 +414,9 @@ A função **divBN** vai utilizar a função **divBNAux**, que, por sua vez, vai
 
 A função **slowDivBN** determina a divisão entre dois BigNumbers positivos, no entanto, como o nome indica, é lenta, já que esta procura quantas vezes o segundo argumento consegue pertencer ao primeiro argumento (utilizando a função **timeTableBN**). Para optimizar os cálculos fazemos uma divisão dígito a dígito na função **divBNAux**.
 
-A função **divBNAux** vai realizar vários cálculos intermédios ao longo do seu primeiro argumento, o dividendo, dígito a dígito. Procura dividir o primeiro dígito do dividendo pelo divisor (segundo argumento) e guarda o resto desta divisão num dos seus dois acumuladores, neste caso o r, concatenado com o próximo dígito do dividendo, e guarda o quociente da divisão anterior ([] sendo a primeira iteração) concatenado com o quociente desta divisão no outro acumulador, o q. Posteriormente chamamos esta função recursivamente com a cauda do dividendo até que o dividendo seja esgotado.
+A função **divBNAux** vai realizar vários cálculos intermédios ao longo do seu primeiro argumento, o dividendo, dígito a dígito. Procura dividir o primeiro dígito do dividendo pelo divisor (segundo argumento) e guarda o resto desta divisão num dos seus dois acumuladores, neste caso o r, concatenado com o próximo dígito do dividendo, e guarda o quociente da divisão anterior (`[]` sendo a primeira iteração) concatenado com o quociente desta divisão no outro acumulador, o q. Posteriormente chamamos esta função recursivamente com a cauda do dividendo até que o dividendo seja esgotado.
 
-Dado que a divisão pode resultar num quociente 0 e a nossa representação de 0 ser [], de modo a que o quociente tenha 0's a meio tivemos que, provisoriamente, representar o 0 por [0] na função slowDivBN, o que traduz-se, também, na utilização da função **removeHeaderZerosBN** em **divBN** de modo a não representar 0's no início do resultado.
+Dado que a divisão pode resultar num quociente `0` e a nossa representação de `0` ser `[]`, de modo a que o quociente tenha `0's` a meio tivemos que, provisoriamente, representar o `0` por `[0]` na função slowDivBN, o que traduz-se, também, na utilização da função **removeHeaderZerosBN** em **divBN** de modo a não representar `0's` no início do resultado.
 
 ### Testes
 
