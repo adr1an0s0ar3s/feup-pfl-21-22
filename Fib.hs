@@ -15,13 +15,12 @@ fibRec x = fibRec (x-1) + fibRec (x-2)
 
 -- | A função fibLista retorna o elemento de índice fornecido da lista de Fibonacci (calculada através de programação dinâmica)
 fibLista :: (Integral a) => a -> a
-fibLista x = fibListaAux x (0,1)
+fibLista x = fibListaAux x !! fromIntegral x
 
--- | A função fibListaAux 
-fibListaAux :: (Integral a) => a -> (a,a) -> a
-fibListaAux 0 (x,y) = x
-fibListaAux 1 (x,y) = y
-fibListaAux a (x,y) = fibListaAux (a-1) (y,x+y)
+
+-- | A função fibListaAux auxilia
+fibListaAux :: (Integral a) => a -> [a]
+fibListaAux x = 0 : 1 : [a | b <- [2..x], let a = fibListaAux x !! fromIntegral (b-2) + fibListaAux x !! fromIntegral (b-1)]
 
 
 ----------------------- 1.3 -----------------------
@@ -54,9 +53,12 @@ fibListaBNAux [1] (x,y) = y
 fibListaBNAux a (x,y) = fibListaBNAux (subBN a [1]) (y, somaBN x y)
 
 
-fibListaInfinitaBN :: BigNumber -> BigNumber
-fibListaInfinitaBN x = snd (head (filter (\a -> fst a == x) fibBN))
+--fibListaInfinitaBN :: BigNumber -> BigNumber
+--fibListaInfinitaBN x | x == [] = fibBN
 
 
-fibBN :: [(BigNumber, BigNumber)]
-fibBN = scanl (\a b -> (somaBN (fst a) [1], somaBN (snd a) (snd b))) ([], []) (([1], [1]) : fibBN)
+--fibBN :: [(BigNumber, BigNumber)]
+--fibBN = scanl (\a b -> (somaBN (fst a) [1], somaBN (snd a) (snd b))) ([], []) (([1], [1]) : fibBN)
+
+fibBN :: [BigNumber]
+fibBN = scanl somaBN [] ([1] : fibBN)
