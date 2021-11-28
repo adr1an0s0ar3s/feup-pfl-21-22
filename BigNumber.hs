@@ -128,20 +128,16 @@ mulLineBN x (y:ys) carry = ((x * y + carry) `mod` 10) : mulLineBN x ys ((x * y +
 
 
 divBN :: BigNumber -> BigNumber -> (BigNumber, BigNumber)
-divBN (x:xs) (y:ys) | (x:xs) == (y:ys) = ([1], [])
-                    | otherwise = divBNAux (x:xs) (y:ys)
+divBN [] ys = ([], [])
+divBN (x:xs) ys = let r = divBNAux xs ys [] [x] in (removeHeaderZerosBN (fst r), snd r)
 
-divBNAux :: BigNumber -> BigNumber -> (BigNumber, BigNumber)
-divBNAux (x:xs) (y:ys) | x > 0 && y > 0 = (fst resultBothPos, subBN (x:xs) (snd resultBothPos))
-                       | x < 0 && y > 0 = (toggleSignalBN (fst resultBothPos), subBN (x:xs) (toggleSignalBN (snd resultBothPos)))
-                       | x < 0 && y < 0 = (fst resultBothNeg, subBN (x:xs) (snd resultBothNeg))
-                       | x > 0 && y < 0 = (toggleSignalBN (fst resultBothNeg), subBN (x:xs) (toggleSignalBN (snd resultBothNeg)))
-                       where resultBothNeg = head [(i, a) | (i, a) <- zip [scanner (show b) | b <- [1..]] [mulBN (y:ys) (scanner (show b)) | b <- [1..]], a == (x:xs) || greaterThanBN a (x:xs)]
-                             resultBothPos = head [(i, a) | (i, a) <- zip [scanner (show b) | b <- [1..]] [mulBN (y:ys) (scanner (show b)) | b <- [1..]], a == (x:xs) || greaterThanBN (somaBN a (y:ys)) (x:xs)]
-                        
+divBNAux :: BigNumber -> BigNumber -> BigNumber -> BigNumber -> (BigNumber, BigNumber)
+divBNAux [] ys q r = let a = slowDivBN r ys in (q ++ fst a, snd a)
+divBNAux (x:xs) ys q r = let a = slowDivBN r ys in divBNAux xs ys (q ++ fst a) (snd a ++ [x])
 
+slowDivBN :: BigNumber -> BigNumber -> (BigNumber, BigNumber)
+slowDivBN xs ys = (if null (fst r) then [0] else fst r, subBN xs (snd r))
+            where r = head (filter (\x -> greaterThanBN (somaBN (snd x) ys) xs) (timeTableBN ys))
 
--- head [(i, a) | (i, a) <- zip [1,-1..] [mulBN (y:ys) (scanner (show b)) | b <- [1,-1..]], a == (x:xs) || greaterThanBN a (x:xs)]
--- D = Q * d + R
--- Q = (D - R) / d
--- R = D - Q * d
+timeTableBN :: BigNumber -> [(BigNumber, BigNumber)]
+timeTableBN x = scanl (\a b -> (somaBN (fst a) [1], somaBN (snd a) b)) ([], []) [x | _ <- [1..]]
