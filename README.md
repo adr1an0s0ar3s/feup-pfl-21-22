@@ -475,6 +475,72 @@ Just ([2],[2,5])
 
 Como podemos observar, os resultados são os esperados.
 
+# Funções Auxiliares ao Módulo BigNumber.hs
+
+## addHeaderZerosBN
+
+```
+addHeaderZerosBN :: Int -> BigNumber -> BigNumber
+addHeaderZerosBN x bn = [0 | _ <- [1..x]] ++ bn
+```
+
+A função addHeaderZerosBN adiciona a quantidade indicada de 0's à cabeça de um Big-Number.
+
+## removeHeaderZerosBN
+
+```
+removeHeaderZerosBN :: BigNumber -> BigNumber
+removeHeaderZerosBN [] = []
+removeHeaderZerosBN (x:xs) | x /= 0 = x:xs
+                           | otherwise = removeHeaderZerosBN xs
+```
+
+A função removeHeaderZerosBN remove os 0's iniciais de um Big-Number.
+
+## toggleSignalBN
+
+```
+toggleSignalBN :: BigNumber -> BigNumber
+toggleSignalBN [] = []
+toggleSignalBN (x:xs) | x == 0 = x : toggleSignalBN xs
+                      | otherwise = (-x):xs
+```
+
+A função toggleSignalBN troca o sinal a um Big-Number.
+
+## greaterThanBN
+
+```
+greaterThanBN :: BigNumber -> BigNumber -> Bool
+greaterThanBN [] [] = False
+greaterThanBN (x:xs) [] | x < 0 = False
+                        | otherwise = True
+greaterThanBN [] (y:ys) | y < 0 = True
+                        | otherwise = False
+greaterThanBN (x:xs) (y:ys) | x < 0 && y < 0 = toggleSignalBN bn1 < toggleSignalBN bn2
+                            | otherwise = bn1 > bn2
+                            where bn1 = addHeaderZerosBN (length (y:ys) - length (x:xs)) (x:xs)
+                                  bn2 = addHeaderZerosBN (length (x:xs) - length (y:ys)) (y:ys)
+```
+
+A função greaterThanBN verifica se o Big-Number passado como primeiro argumento é maior do que o Big-Number passado como segundo argumento.
+
+## timeTableBN
+
+```
+timeTableBN :: BigNumber -> [(BigNumber, BigNumber)]
+timeTableBN x = scanl (\a b -> (somaBN (fst a) [1], somaBN (snd a) b)) ([], []) [x | _ <- [1..]]
+```
+
+A função timeTableBN retorna a tabuada do Big-Number passado como argumento, no formato [(Indice, Multiplicação)].
+
+Por exemplo:
+
+```
+ghci> take 5 (timeTableBN [2])
+[([],[]),([1],[2]),([2],[4]),([3],[6]),([4],[8])]
+```
+
 # Grupo
 
 - Adriano Soares <up201904873@up.pt>
