@@ -46,19 +46,20 @@ type BigNumber = [Int]
 
 scanner :: String -> BigNumber
 scanner [] = []
+scanner ['0'] = []
 scanner [a] = [read [a] :: Int]
-scanner (a:b:cs) | a == '-'  = (- read [b] :: Int) : [read [x] :: Int | x <- cs]
-                 | otherwise = [read [x] :: Int | x <- a:b:cs]
+scanner (a:b:cs) | a == '-'  = toggleSignalBN (removeHeaderZerosBN [read [x] :: Int | x <- b:cs])
+                 | otherwise = removeHeaderZerosBN [read [x] :: Int | x <- a:b:cs]
 
 
 ----------------------- 2.3 -----------------------
 
 
 output :: BigNumber -> String
-output [] = []
+output [] = ['0']
 output (x:xs) | x < 0 = '-' : bignumber
               | otherwise = bignumber
-              where bignumber = foldr (\a b -> show (abs a) ++ b) [] (x:xs)
+              where bignumber = foldr (\a b -> show (abs a) ++ b) [] (removeHeaderZerosBN (x:xs))
 
 
 ----------------------- 2.4 -----------------------

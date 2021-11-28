@@ -20,7 +20,14 @@ fibLista x = fibListaAux x !! fromIntegral x
 
 -- | A função fibListaAux auxilia
 fibListaAux :: (Integral a) => a -> [a]
-fibListaAux x = 0 : 1 : [a | b <- [2..x], let a = fibListaAux x !! fromIntegral (b-2) + fibListaAux x !! fromIntegral (b-1)]
+fibListaAux x = 
+
+
+
+-- fibListaAux x = 0 : 1 : [a | b <- [2..x], let a = fibListaAux x !! fromIntegral (b-2) + fibListaAux x !! fromIntegral (b-1)]
+
+
+
 
 
 ----------------------- 1.3 -----------------------
@@ -45,15 +52,21 @@ fibRecBN x = somaBN (fibRecBN (subBN x [1])) (fibRecBN (subBN x [2]))
 
 ----------------------- 3.2 -----------------------
 
-
+{-
 fibListaBN :: BigNumber -> BigNumber 
 fibListaBN x = fibListaBNAux x ([],[1])
 
 
-fibListaBNAux :: BigNumber -> (BigNumber, BigNumber) -> BigNumber
+fibListaBNAux :: BigNumber -> [BigNumber]
 fibListaBNAux [] (x,y) = x
 fibListaBNAux [1] (x,y) = y
 fibListaBNAux a (x,y) = fibListaBNAux (subBN a [1]) (y, somaBN x y)
+-}
+
+fibListaBNAux :: BigNumber -> [BigNumber]
+fibListaBNAux [] = []
+fibListaBNAux x = fibListaBNAux 
+
 
 
 ----------------------- 3.3 -----------------------

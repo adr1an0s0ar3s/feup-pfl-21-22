@@ -123,7 +123,91 @@ fibListaBNAux [1] (x,y) = y
 fibListaBNAux a (x,y) = fibListaBNAux (subBN a [1]) (y, somaBN x y)
 ```
 
-A função fibListaBN 
+A função fibListaBN ...
+
+### Testes
+
+```
+
+```
+
+Como podemos observar, ...
+
+---
+
+## fibListaInfinitaBN
+
+```
+
+```
+
+A função fibListaInfinitaBN ...
+
+### Testes
+
+```
+
+```
+
+Como podemos observar, ...
+
+# Módulo BigNumber.h
+
+A definição de Big-Number é:
+
+```
+type BigNumber = [Int]
+```
+
+Números negativos são representados em Big-Number apenas com o primeiro dígito a negativo. Exemplo: -123 corresponde ao Big-Number [-1,2,3].
+
+O número 0 é representado em Big-Number como [] (lista vazia).
+
+## scanner
+
+```
+scanner :: String -> BigNumber
+scanner [] = []
+scanner ['0'] = []
+scanner [a] = [read [a] :: Int]
+scanner (a:b:cs) | a == '-'  = toggleSignalBN (removeHeaderZerosBN [read [x] :: Int | x <- b:cs])
+                 | otherwise = removeHeaderZerosBN [read [x] :: Int | x <- a:b:cs]
+```
+
+A função scanner pega num número em forma de string e devolve esse mesmo número na forma de BigNumber. Como uma string é uma lista de Char, basta percorrer a lista e converter os Char para Int. Se o primeiro elemento da lista for o sinal negativo ('-'), é efetuada a conversão da restante lista e é negado o seu primeiro elemento.
+
+### Testes
+
+```
+ghci> scanner "123"
+[1,2,3]
+ghci> scanner "-123"
+[-1,2,3]
+ghci> scanner "0"
+[]
+ghci> scanner "000011"
+[1,1]
+```
+
+Como podemos observar, a função comporta-se como seria esperado.
+
+## output
+
+```
+output :: BigNumber -> String
+output [] = []
+output (x:xs) | x < 0 = '-' : bignumber
+              | otherwise = bignumber
+              where bignumber = foldr (\a b -> show (abs a) ++ b) [] (x:xs)
+```
+
+A função output faz o inverso da scanner, ou seja, pega num Big-Number e retorna-lo em forma de String. Como uma String é uma lista de Char, basta fazer conversão do tipo Int para Char. Se o primeiro elemento do Big-Number for negativo, é só adicionar um '-' à String.
+
+### Testes
+
+```
+
+```
 
 # Grupo
 
