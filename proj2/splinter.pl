@@ -66,3 +66,13 @@ move(Board, X, Y, 'N', NewBoard) :-
     transpose(Board, B1),
     move(B1, Y, X, 'O', B2),
     transpose(B2, NewBoard).
+
+move(Board, X, Y, 'SE', NewBoard) :-
+    X >= Y,
+    get_diagonal(Board, X, Y, D),
+    move_right(D, Y, NewD),
+    set_diagonal(Board, X, Y, NewD, NewBoard).
+move(Board, X, Y, 'SE', NewBoard) :-      % When X < Y
+    get_diagonal(Board, X, Y, D),
+    move_right(D, X, NewD),
+    set_diagonal(Board, X, Y, NewD, NewBoard).

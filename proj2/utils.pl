@@ -60,6 +60,15 @@ transpose(Matrix, X, Acc1, NewMatrix) :-
     transpose(Matrix, NewX, Acc2, NewMatrix).
 
 /*
+Mirrors the matrix given in the first argument by the y-axis, the resultant matrix is
+returned in the second argument.
+*/
+mirror([], []).
+mirror([L | R], [NewL | NewR]) :-
+    revert(L, NewL),
+    mirror(R, NewR).
+
+/*
 Obtains the Beta 2/4 diagonal of the matrix presented in the first argument that includes
 the element of the coordinates given in the second and third argument, the result is
 returned by the fourth argument.
