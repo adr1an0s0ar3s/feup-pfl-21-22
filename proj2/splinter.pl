@@ -76,3 +76,21 @@ move(Board, X, Y, 'SE', NewBoard) :-      % When X < Y
     get_diagonal(Board, X, Y, D),
     move_right(D, X, NewD),
     set_diagonal(Board, X, Y, NewD, NewBoard).
+
+move(Board, X, Y, 'NO', NewBoard) :- % still not working
+    X >= Y,
+    get_diagonal(Board,X,Y,D),
+    length(D,A1),
+    NewY is A1 - 1 - Y,
+    revert(D, MirrorD),
+    move_right(MirrorD, NewY, NewMirrorD),
+    revert(NewMirrorD, NewD),
+    set_diagonal(Board, X, Y, NewD, NewBoard).
+move(Board, X, Y, 'NO', NewBoard) :- % When X < Y
+    get_diagonal(Board,X,Y,D),
+    length(D,A1),
+    NewX is A1 - 1 - X,
+    revert(D, MirrorD),
+    move_right(MirrorD, NewX, NewMirrorD),
+    revert(NewMirrorD, NewD),
+    set_diagonal(Board, X, Y, NewD, NewBoard).
