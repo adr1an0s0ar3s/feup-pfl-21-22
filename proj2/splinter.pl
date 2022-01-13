@@ -90,3 +90,10 @@ move(Board, X, Y, 'NO', NewBoard) :-
     move_right(ReverseDiagonal, ReverseIndex, NewReverseDiagonal),
     reverse(NewReverseDiagonal, NewDiagonal),
     set_diagonal(Board, X, Y, NewDiagonal, NewBoard).
+
+move(Board, X, Y, 'SO', NewBoard) :-
+    reverse(Board, B1),
+    length(Board, A1),
+    NewY is A1 - Y - 1,
+    move(B1, X, NewY, 'NO', B2),
+    reverse(B2, NewBoard).
