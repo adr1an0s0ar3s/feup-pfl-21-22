@@ -29,22 +29,11 @@ set_elem(I, E, [H | T], [H | NewT]) :-
     set_elem(NewI, E, T, NewT).
 
 /*
-Obtains the column of index given in the second argument of the matrix presented in
-the first argument resulting in the list in the third argument.
-*/
-get_column(Matrix, X, C) :- get_column(Matrix, X, [], C).
-get_column([], _, R, R).
-get_column([L | R], X, Acc1, C) :-
-    get_elem(X, L, A1),
-    append(Acc1, [A1], Acc2),
-    get_column(R, X, Acc2, C).
-
-/*
 Mirrors the matrix given in the first argument by the y-axis, the resultant matrix is
 returned in the second argument.
 */
-mirror([], []).
-mirror([L | R], [NewL | NewR]) :-
+matrix_mirror_x([], []).
+matrix_mirror_x([L | R], [NewL | NewR]) :-
     reverse(L, NewL),
     mirror(R, NewR).
 
