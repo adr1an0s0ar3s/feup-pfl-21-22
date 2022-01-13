@@ -1,18 +1,11 @@
+:- use_module(library(lists)).
+
 /*
 Removes the first instance of the first argument in the list of the second argument
 resulting in the list present in the third argument.
 */
 del_elem(A1, [A1 | T], T) :- !.
 del_elem(A1, [H | T1], [H | T2]) :- del_elem(A1, T1, T2).
-
-/*
-Reverts the list in the first argument resulting in the list present in the second
-argument.
-*/
-revert([], []).
-revert([H | T], L2) :-
-    revert(T, L1),
-    append(L1, [H], L2).
 
 /*
 Retrieves to the third argument the element present in the index given in the first
@@ -47,25 +40,12 @@ get_column([L | R], X, Acc1, C) :-
     get_column(R, X, Acc2, C).
 
 /*
-Tranposes a matrix given in the first argument, the result is presented in the second
-argument.
-*/
-transpose(Matrix, NewMatrix) :- transpose(Matrix, 0, [], NewMatrix).
-transpose([L | _], X, R, R) :-
-    length(L, X).
-transpose(Matrix, X, Acc1, NewMatrix) :-
-    NewX is X + 1,
-    get_column(Matrix, X, L1),
-    append(Acc1, [L1], Acc2),
-    transpose(Matrix, NewX, Acc2, NewMatrix).
-
-/*
 Mirrors the matrix given in the first argument by the y-axis, the resultant matrix is
 returned in the second argument.
 */
 mirror([], []).
 mirror([L | R], [NewL | NewR]) :-
-    revert(L, NewL),
+    reverse(L, NewL),
     mirror(R, NewR).
 
 /*

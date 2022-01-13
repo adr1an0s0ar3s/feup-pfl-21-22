@@ -1,3 +1,4 @@
+:- use_module(library(lists)).
 :- [utils].
 
 /*
@@ -50,9 +51,9 @@ move([L | R], X, Y, 'E', [L | NewR]) :-
 move([L | R], X, 0, 'O', [NewL | R]) :-
     length(L, A1),
     NewX is A1 - 1 - X,
-    revert(L, L1),
+    reverse(L, L1),
     move_right(L1, NewX, L2),
-    revert(L2, NewL).
+    reverse(L2, NewL).
 move([L | R], X, Y, 'O', [L | NewR]) :-
     NewY is Y - 1,
     move(R, X, NewY, 'O', NewR).
@@ -82,15 +83,15 @@ move(Board, X, Y, 'NO', NewBoard) :- % still not working
     get_diagonal(Board,X,Y,D),
     length(D,A1),
     NewY is A1 - 1 - Y,
-    revert(D, MirrorD),
+    reverse(D, MirrorD),
     move_right(MirrorD, NewY, NewMirrorD),
-    revert(NewMirrorD, NewD),
+    reverse(NewMirrorD, NewD),
     set_diagonal(Board, X, Y, NewD, NewBoard).
 move(Board, X, Y, 'NO', NewBoard) :- % When X < Y
     get_diagonal(Board,X,Y,D),
     length(D,A1),
     NewX is A1 - 1 - X,
-    revert(D, MirrorD),
+    reverse(D, MirrorD),
     move_right(MirrorD, NewX, NewMirrorD),
-    revert(NewMirrorD, NewD),
+    reverse(NewMirrorD, NewD),
     set_diagonal(Board, X, Y, NewD, NewBoard).
