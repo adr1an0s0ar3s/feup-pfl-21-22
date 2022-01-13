@@ -99,8 +99,6 @@ move(Board, X, Y, 'SO', NewBoard) :-
     reverse(B2, NewBoard).
 
 
-
-
 find_one_king(Board, X, Y) :-
     find_one_king(Board, X, Y, []).
 
@@ -142,3 +140,30 @@ inside_board([L | R], X, Y) :-
 
 is_king(bk).
 is_king(wk).
+
+
+display_game(Board) :- % This is gonna be a pain in the ass
+    nl,
+    write('    A   B   C   D   E   F   G   H   I   J   K   L   M   N   O    '),
+    nl, nl,
+    write_numbers(1,18),
+    write_matrix(Board).
+
+write_numbers(N1, N2) :-
+    N2 >= N1,
+    write(N1),
+    nl, nl,
+    N3 is N1 + 1,
+    write_numbers(N3, N2).
+
+write_matrix([H | T]) :-
+    write('    '),
+    write_line(H),
+    nl, nl,
+    write_matrix(T).
+
+write_line([]).
+write_line([H | T]) :-
+    write(H),
+    write('   '),
+    write_line(T).
