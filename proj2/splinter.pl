@@ -81,20 +81,12 @@ move(Board, X, Y, 'NE', NewBoard) :-
     move(B1, X, NewY, 'SE', B2),
     reverse(B2, NewBoard).
 
-move(Board, X, Y, 'NO', NewBoard) :- % still not working
-    X >= Y,
-    get_diagonal(Board, X, Y, D),
-    length(D, A1),
-    NewY is A1 - Y - 1,
-    reverse(D, MirrorD),
-    move_right(MirrorD, NewY, NewMirrorD),
-    reverse(NewMirrorD, NewD),
-    set_diagonal(Board, X, Y, NewD, NewBoard).
-move(Board, X, Y, 'NO', NewBoard) :- % When X < Y
-    get_diagonal(Board,X,Y,D),
-    length(D,A1),
-    NewX is A1 - 1 - X,
-    reverse(D, MirrorD),
-    move_right(MirrorD, NewX, NewMirrorD),
-    reverse(NewMirrorD, NewD),
-    set_diagonal(Board, X, Y, NewD, NewBoard).
+move(Board, X, Y, 'NO', NewBoard) :-
+    get_diagonal(Board, X, Y, Diagonal),
+    min_member(Index, [X, Y]),
+    reverse(Diagonal, ReverseDiagonal),
+    length(Diagonal, Length),
+    ReverseIndex is Length - Index - 1,
+    move_right(ReverseDiagonal, ReverseIndex, NewReverseDiagonal),
+    reverse(NewReverseDiagonal, NewDiagonal),
+    set_diagonal(Board, X, Y, NewDiagonal, NewBoard).

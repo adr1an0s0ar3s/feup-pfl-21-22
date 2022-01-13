@@ -73,7 +73,7 @@ set_diagonal([L | R], X, Y, Diagonal, [L | NewR]) :-
     NewY is Y - 1,
     set_diagonal(R, X, NewY, Diagonal, NewR).
 set_diagonal_aux([], _, [], []).
-set_diagonal_aux([L | _], X, [], []) :-
+set_diagonal_aux([L | T], X, [], [L | T]) :-
     length(L, X).
 set_diagonal_aux([L | R], X, [H | T], [NewL | NewR]) :-
     NewX is X + 1,
