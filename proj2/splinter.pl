@@ -50,7 +50,7 @@ move([L | R], X, Y, 'E', [L | NewR]) :-
 
 move([L | R], X, 0, 'O', [NewL | R]) :-
     length(L, A1),
-    NewX is A1 - 1 - X,
+    NewX is A1 - X - 1,
     reverse(L, L1),
     move_right(L1, NewX, L2),
     reverse(L2, NewL).
@@ -69,20 +69,23 @@ move(Board, X, Y, 'N', NewBoard) :-
     transpose(B2, NewBoard).
 
 move(Board, X, Y, 'SE', NewBoard) :-
-    X >= Y,
     get_diagonal(Board, X, Y, D),
-    move_right(D, Y, NewD),
+    min_member(A1, [X, Y]),
+    move_right(D, A1, NewD),
     set_diagonal(Board, X, Y, NewD, NewBoard).
-move(Board, X, Y, 'SE', NewBoard) :-      % When X < Y
-    get_diagonal(Board, X, Y, D),
-    move_right(D, X, NewD),
-    set_diagonal(Board, X, Y, NewD, NewBoard).
+
+move(Board, X, Y, 'NE', NewBoard) :-
+    reverse(Board, B1),
+    length(Board, A1),
+    NewY is A1 - Y - 1,
+    move(B1, X, NewY, 'SE', B2),
+    reverse(B2, NewBoard).
 
 move(Board, X, Y, 'NO', NewBoard) :- % still not working
     X >= Y,
-    get_diagonal(Board,X,Y,D),
-    length(D,A1),
-    NewY is A1 - 1 - Y,
+    get_diagonal(Board, X, Y, D),
+    length(D, A1),
+    NewY is A1 - Y - 1,
     reverse(D, MirrorD),
     move_right(MirrorD, NewY, NewMirrorD),
     reverse(NewMirrorD, NewD),
