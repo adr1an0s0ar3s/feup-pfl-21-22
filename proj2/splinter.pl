@@ -100,12 +100,12 @@ move(Board, X, Y, 'SO', NewBoard) :-
 
 
 find_one_king(Board, X, Y) :-
-    find_one_king(Board, X, Y, []).
+    find_one_king(Board, X, Y, [X-Y]).
 
 /*
 Verifying that the element is a BK, WK or an empty
 */
-find_one_king(Board, X, Y, _) :-
+find_one_king(Board, X, Y, [_, _ | _]) :-
     matrix_get_elem(Board, X, Y, E),
     is_king(E).
 
@@ -113,13 +113,13 @@ find_one_king(Board, X, Y, _) :-
 Searching BK and WK in neighbours
 */
 find_one_king(Board, X, Y, V) :-
-    \+ member(X-Y, V),
-    \+ matrix_get_elem(Board, X, Y, empty),
     surrounding_delta(DeltaX, DeltaY),
     NewX is X + DeltaX,
     NewY is Y + DeltaY,
-    inside_board(Board, X, Y),
-    find_one_king(Board, NewX, NewY, [X-Y | V]).
+    inside_board(Board, NewX, NewY),
+    \+ member(NewX-NewY, V),
+    \+ matrix_get_elem(Board, NewX, NewY, empty),
+    find_one_king(Board, NewX, NewY, [NewX-NewY | V]).
 
 surrounding_delta(-1, -1).
 surrounding_delta(0, -1).
@@ -141,29 +141,100 @@ inside_board([L | R], X, Y) :-
 is_king(bk).
 is_king(wk).
 
+splinter(Board, NewBoard) :- splinter(Board, 0, 0, Board, NewBoard).
+splinter([L | T], X, Y, R, R) :-
+    length(L, A1),
+    X = A1,
+    length([L | T], A2),
+    Y = A2.
+splinter([L | R], X, Y, Acc1, NewBoard) :-
+    length(L, A1),
+    X = A1,
+    NewY is Y + 1,
+    splinter([L | R], 0, NewY, Acc1, NewBoard).
+splinter(Board, X, Y, Acc1, NewBoard) :-
+    \+ find_one_king(Board, X, Y),
+    matrix_set_elem(Acc1, X, Y, empty, Acc2),
+    NewX is X + 1,
+    splinter(Board, NewX, Y, Acc2, NewBoard). 
+splinter(Board, X, Y, Acc1, NewBoard) :-
+    NewX is X + 1,
+    splinter(Board, NewX, Y, Acc1, NewBoard).    
 
-display_game(Board) :- % This is gonna be a pain in the ass
+
+find_king(Board, X, Y) :- find_king(Board, 0, X, Y).
+find_king([L | _], Y, X, Y) :-
+    nth0(X, L, E),
+    is_king(E).
+find_king([_ | R], Acc1, X, Y) :-
+    Acc2 is Acc1 + 1,
+    find_king(R, Acc2, X, Y).
+
+
+game_over(Board) :-
+    find_king(Board, X, Y),
+    \+ find_one_king(Board, X, Y).
+
+
+display_game(Board) :-
     nl,
     write('    A   B   C   D   E   F   G   H   I   J   K   L   M   N   O    '),
     nl, nl,
-    write_numbers(1,18),
-    write_matrix(Board).
+    write_matrix(0,17, Board).
 
-write_numbers(N1, N2) :-
+write_matrix(N1, N2, [H | T]) :-
     N2 >= N1,
-    write(N1),
+    write(N1), write('   '), write_line(H),
     nl, nl,
     N3 is N1 + 1,
-    write_numbers(N3, N2).
-
-write_matrix([H | T]) :-
-    write('    '),
-    write_line(H),
-    nl, nl,
-    write_matrix(T).
+    write_numbers(N3, N2, T).
 
 write_line([]).
 write_line([H | T]) :-
     write(H),
     write('   '),
     write_line(T).
+
+char_to_number(C, N1) :- 
+    char_code(C, N),
+    N1 is N - 65.
+
+/*
+position(X, Y) :- 
+    14 >= X,
+    17 >= Y.
+
+direction(N).
+direction(S).
+direction(E).
+direction(O).
+direction(NE).
+direction(NO).
+direction(SE).
+direction(SO).
+
+valid_move(X, Y, D) :-
+    position(X, Y),
+    direction(D).
+
+
+get_move(C, N, D) :-
+    write('Choose the piece you want to move and the direction: A1 NO'),
+    nl,
+    read(C),
+    char_to_number(C, X),
+    read(Y),
+    position(X, Y),
+    read(D),
+    direction(D),
+    valid_move(X, Y, D).
+
+play_turn(Board, C, N, D, NewBoard) :-
+    display_game(Board),
+    nl,
+    get_move(C1, N1, D1),
+    nl,
+    move(Board, C1, N1, D, NewBoard).
+*/
+    
+    

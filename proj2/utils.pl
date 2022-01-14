@@ -80,3 +80,13 @@ matrix_get_elem([_ | R], X, Y, E) :-
     Y > 0,
     NewY is Y - 1,
     matrix_get_elem(R, X, NewY, E).
+
+/*
+TODO
+*/
+matrix_set_elem([L | R], X, 0, E, [NewL | R]) :-
+    set_elem(X, E, L, NewL).
+matrix_set_elem([L | R], X, Y, E, [L | NewR]) :-
+    Y > 0,
+    NewY is Y - 1,
+    matrix_set_elem(R, X, NewY, E, NewR).
