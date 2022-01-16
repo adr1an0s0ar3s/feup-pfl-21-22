@@ -90,3 +90,10 @@ matrix_set_elem([L | R], X, Y, E, [L | NewR]) :-
     Y > 0,
     NewY is Y - 1,
     matrix_set_elem(R, X, NewY, E, NewR).
+
+/*
+Converts a character to a number, using its ASCII code
+*/
+char_to_number(Char, Number) :- 
+    char_code(Char, N),
+    Number is N - 65.
