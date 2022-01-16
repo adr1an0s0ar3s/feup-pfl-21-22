@@ -96,4 +96,4 @@ Converts a character to a number, using its ASCII code
 */
 char_to_number(Char, Number) :- 
     char_code(Char, N),
-    Number is N - 65.
+    Number is N - 97.

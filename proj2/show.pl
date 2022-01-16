@@ -26,7 +26,7 @@ initial_state([[empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empt
 
 display_game(Board) :-
     nl,
-    write('    A   B   C   D   E   F   G   H   I   J   K   L   M   N   O    '),
+    write('    a   b   c   d   e   f   g   h   i   j   k   l   m   n   o    '),
     nl, nl,
     write_matrix(0,17, Board).
 
