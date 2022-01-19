@@ -97,3 +97,10 @@ Converts a character to a number, using its ASCII code
 char_to_number(Char, Number) :- 
     char_code(Char, N),
     Number is N - 97.
+
+/*
+Converts a number to a character
+*/
+number_to_char(Number, Char) :-
+    N is Number + 97,
+    char_code(Char, N).

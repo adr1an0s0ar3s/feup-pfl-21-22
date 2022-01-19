@@ -2,40 +2,13 @@
 :- [utils].
 
 /*
-Tabuleiro de jogo, 18x15, é iniciado com as seguintes peças ao centro:
-- bp - Black Pawn
-- wp - White Pawn
-- bk - Black King
-- wk - White King
-*/
-initial_state([[empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty],
-               [empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty],
-               [empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty],
-               [empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty],
-               [empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty],
-               [empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty],
-               [empty,empty,empty,empty,empty,       bp,wp,bp,wp,bp,        empty,empty,empty,empty,empty],
-               [empty,empty,empty,empty,empty,       wp,bp,wp,bp,wp,        empty,empty,empty,empty,empty],
-               [empty,empty,empty,empty,empty,       bp,wp,bk,wp,bp,        empty,empty,empty,empty,empty],
-               [empty,empty,empty,empty,empty,       wp,bp,wk,bp,wp,        empty,empty,empty,empty,empty],
-               [empty,empty,empty,empty,empty,       bp,wp,bp,wp,bp,        empty,empty,empty,empty,empty],
-               [empty,empty,empty,empty,empty,       wp,bp,wp,bp,wp,        empty,empty,empty,empty,empty],
-               [empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty],
-               [empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty],
-               [empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty],
-               [empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty],
-               [empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty],
-               [empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty]]).
-
-
-/*
 Pushes to the right all the elements of the list in the first argument after the index
 given in the second argument until an empty, resulting in the list present in the third
 argument.
 */
-push_right([H | T], 0, [empty, H | NewT]) :-
-    \+ H = empty,
-    del_elem(empty, T, NewT).
+push_right([H | T], 0, [<>, H | NewT]) :-
+    \+ H = <>,
+    del_elem(<>, T, NewT).
 push_right([H | T], X, [H | NewT]) :-
     X > 0,
     NewX is X - 1,
@@ -118,7 +91,7 @@ find_one_king(Board, X, Y, V) :-
     NewY is Y + DeltaY,
     inside_board(Board, NewX, NewY),
     \+ member(NewX-NewY, V),
-    \+ matrix_get_elem(Board, NewX, NewY, empty),
+    \+ matrix_get_elem(Board, NewX, NewY, <>),
     find_one_king(Board, NewX, NewY, [NewX-NewY | V]).
 
 surrounding_delta(-1, -1).
@@ -154,7 +127,7 @@ splinter([L | R], X, Y, Acc1, NewBoard) :-
     splinter([L | R], 0, NewY, Acc1, NewBoard).
 splinter(Board, X, Y, Acc1, NewBoard) :-
     \+ find_one_king(Board, X, Y),
-    matrix_set_elem(Acc1, X, Y, empty, Acc2),
+    matrix_set_elem(Acc1, X, Y, <>, Acc2),
     NewX is X + 1,
     splinter(Board, NewX, Y, Acc2, NewBoard). 
 splinter(Board, X, Y, Acc1, NewBoard) :-

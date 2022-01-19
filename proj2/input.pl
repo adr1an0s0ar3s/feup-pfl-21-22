@@ -13,7 +13,7 @@ validate_position(Column, Row) :-
 
 read_direction(Direction) :-
     repeat,
-    write('Please select a valid direction:\n'),
+    write('Please select a valid direction (n, ne, e, se, s, so, o, no):\n'),
     read(Direction),
     validate_direction(Direction).
 
@@ -29,4 +29,3 @@ validate_direction(so).
 read_move(Column, Row, Direction) :- 
     read_position(Column, Row),
     read_direction(Direction).
-
