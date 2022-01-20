@@ -1,14 +1,43 @@
 :- use_module(library(lists)).
 :- [utils].
 
+empty(<>).
+
+/*
+Game board, 18x15, it's initialized with these pieces at the center:
+- bp - Black Pawn
+- wp - White Pawn
+- bk - Black King
+- wk - White King
+*/
+initial_state( [[Em,Em,Em,Em,Em,Em,Em,Em,Em,Em,Em,Em,Em,Em,Em],
+                [Em,Em,Em,Em,Em,Em,Em,Em,Em,Em,Em,Em,Em,Em,Em],
+                [Em,Em,Em,Em,Em,Em,Em,Em,Em,Em,Em,Em,Em,Em,Em],
+                [Em,Em,Em,Em,Em,Em,Em,Em,Em,Em,Em,Em,Em,Em,Em],
+                [Em,Em,Em,Em,Em,Em,Em,Em,Em,Em,Em,Em,Em,Em,Em],
+                [Em,Em,Em,Em,Em,Em,Em,Em,Em,Em,Em,Em,Em,Em,Em],
+                [Em,Em,Em,Em,Em,bp,wp,bp,wp,bp,Em,Em,Em,Em,Em],
+                [Em,Em,Em,Em,Em,wp,bp,wp,bp,wp,Em,Em,Em,Em,Em],
+                [Em,Em,Em,Em,Em,bp,wp,bk,wp,bp,Em,Em,Em,Em,Em],
+                [Em,Em,Em,Em,Em,wp,bp,wk,bp,wp,Em,Em,Em,Em,Em],
+                [Em,Em,Em,Em,Em,bp,wp,bp,wp,bp,Em,Em,Em,Em,Em],
+                [Em,Em,Em,Em,Em,wp,bp,wp,bp,wp,Em,Em,Em,Em,Em],
+                [Em,Em,Em,Em,Em,Em,Em,Em,Em,Em,Em,Em,Em,Em,Em],
+                [Em,Em,Em,Em,Em,Em,Em,Em,Em,Em,Em,Em,Em,Em,Em],
+                [Em,Em,Em,Em,Em,Em,Em,Em,Em,Em,Em,Em,Em,Em,Em],
+                [Em,Em,Em,Em,Em,Em,Em,Em,Em,Em,Em,Em,Em,Em,Em],
+                [Em,Em,Em,Em,Em,Em,Em,Em,Em,Em,Em,Em,Em,Em,Em],
+                [Em,Em,Em,Em,Em,Em,Em,Em,Em,Em,Em,Em,Em,Em,Em]] ) :- empty(Em).
+
 /*
 Pushes to the right all the elements of the list in the first argument after the index
 given in the second argument until an empty, resulting in the list present in the third
 argument.
 */
-push_right([H | T], 0, [<>, H | NewT]) :-
-    \+ H = <>,
-    del_elem(<>, T, NewT).
+push_right([H | T], 0, [Em, H | NewT]) :-
+    \+ empty(H),
+    empty(Em),
+    del_elem(Em, T, NewT).
 push_right([H | T], X, [H | NewT]) :-
     X > 0,
     NewX is X - 1,
@@ -91,7 +120,8 @@ find_one_king(Board, X, Y, V) :-
     NewY is Y + DeltaY,
     inside_board(Board, NewX, NewY),
     \+ member(NewX-NewY, V),
-    \+ matrix_get_elem(Board, NewX, NewY, <>),
+    matrix_get_elem(Board, NewX, NewY, E),
+    \+ empty(E),
     find_one_king(Board, NewX, NewY, [NewX-NewY | V]).
 
 surrounding_delta(-1, -1).
@@ -127,7 +157,8 @@ splinter([L | R], X, Y, Acc1, NewBoard) :-
     splinter([L | R], 0, NewY, Acc1, NewBoard).
 splinter(Board, X, Y, Acc1, NewBoard) :-
     \+ find_one_king(Board, X, Y),
-    matrix_set_elem(Acc1, X, Y, <>, Acc2),
+    empty(Em),
+    matrix_set_elem(Acc1, X, Y, Em, Acc2),
     NewX is X + 1,
     splinter(Board, NewX, Y, Acc2, NewBoard). 
 splinter(Board, X, Y, Acc1, NewBoard) :-
