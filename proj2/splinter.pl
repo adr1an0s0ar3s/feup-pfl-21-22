@@ -1,14 +1,20 @@
 :- use_module(library(lists)).
 :- [utils].
 
-empty(<>).
+/*
+Definition of empty cell for ease of change if needed.
+*/
+empty(<>).  % To DEBUG change it to 'empty(empty).'
+
+/*
+Helper function that checks if a given cell content is one of the kings.
+*/
+is_king(bk).
+is_king(wk).
 
 /*
 Game board, 18x15, it's initialized with these pieces at the center:
-- bp - Black Pawn
-- wp - White Pawn
-- bk - Black King
-- wk - White King
+bp (Black Pawn), wp (White Pawn), bk (Black King) and wk (White King).
 */
 initial_state( [[Em,Em,Em,Em,Em,Em,Em,Em,Em,Em,Em,Em,Em,Em,Em],
                 [Em,Em,Em,Em,Em,Em,Em,Em,Em,Em,Em,Em,Em,Em,Em],
@@ -43,7 +49,10 @@ push_right([H | T], X, [H | NewT]) :-
     NewX is X - 1,
     push_right(T, NewX, NewT).
 
-
+/*
+The following set of functions move a given piece at a certain position to the given
+direction, returning the resultant board in the last argument.
+*/
 move([L | R], X, 0, 'E', [NewL | R]) :-
     push_right(L, X, NewL).
 move([L | R], X, Y, 'E', [L | NewR]) :-
@@ -100,30 +109,32 @@ move(Board, X, Y, 'SO', NewBoard) :-
     move(B1, X, NewY, 'NO', B2),
     reverse(B2, NewBoard).
 
-
+/*
+The following set of functions try to find a king beggining in a given position
+by performing a depth-first search. If the starting position is already a king
+the function will ignore it and it'll try to find the opponent's king.
+*/
 find_one_king(Board, X, Y) :-
     find_one_king(Board, X, Y, [X-Y]).
 
-/*
-Verifying that the element is a BK, WK or an empty
-*/
-find_one_king(Board, X, Y, [_, _ | _]) :-
+find_one_king(Board, X, Y, [_, _ | _]) :-   % Verifying that the element is a BK, WK or an empty
     matrix_get_elem(Board, X, Y, E),
     is_king(E).
 
-/*
-Searching BK and WK in neighbours
-*/
-find_one_king(Board, X, Y, V) :-
+find_one_king(Board, X, Y, V) :-            % Searching BK and WK in neighbours
     surrounding_delta(DeltaX, DeltaY),
     NewX is X + DeltaX,
     NewY is Y + DeltaY,
-    inside_board(Board, NewX, NewY),
+    inside_matrix(Board, NewX, NewY),
     \+ member(NewX-NewY, V),
     matrix_get_elem(Board, NewX, NewY, E),
     \+ empty(E),
     find_one_king(Board, NewX, NewY, [NewX-NewY | V]).
 
+/*
+Helper function that returns the delta to sum to the coordinates resulting in all
+eight directions that we can search.
+*/
 surrounding_delta(-1, -1).
 surrounding_delta(0, -1).
 surrounding_delta(1, -1).
@@ -133,17 +144,10 @@ surrounding_delta(0, 1).
 surrounding_delta(-1, 1).
 surrounding_delta(-1, 0).
 
-inside_board([L | R], X, Y) :-
-    X >= 0,
-    length(L, A1),
-    X < A1,
-    Y >= 0,
-    length([L | R], A2),
-    Y < A2.
-
-is_king(bk).
-is_king(wk).
-
+/*
+Function that removes the pieces that aren't connected to any king in all directions,
+returns the resultant board in the last argument.
+*/
 splinter(Board, NewBoard) :- splinter(Board, 0, 0, Board, NewBoard).
 splinter([L | T], X, Y, R, R) :-
     length(L, A1),
@@ -165,7 +169,10 @@ splinter(Board, X, Y, Acc1, NewBoard) :-
     NewX is X + 1,
     splinter(Board, NewX, Y, Acc1, NewBoard).    
 
-
+/*
+Helper function that returns the position of the first king that it finds in the
+board presented in the first argument.
+*/
 find_king(Board, X, Y) :- find_king(Board, 0, X, Y).
 find_king([L | _], Y, X, Y) :-
     nth0(X, L, E),
@@ -174,8 +181,9 @@ find_king([_ | R], Acc1, X, Y) :-
     Acc2 is Acc1 + 1,
     find_king(R, Acc2, X, Y).
 
-
+/*
+Game over checker, the game ends when both kings can't reach each other.
+*/
 game_over(Board) :-
     find_king(Board, X, Y),
     \+ find_one_king(Board, X, Y).
-       

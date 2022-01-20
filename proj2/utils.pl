@@ -82,7 +82,9 @@ matrix_get_elem([_ | R], X, Y, E) :-
     matrix_get_elem(R, X, NewY, E).
 
 /*
-TODO
+Sets the element present at the coordinates given in the second and third argument in the
+matrix given in the first argument to the value presented in the fourth argument, the
+resultant board is returned in the last argument.
 */
 matrix_set_elem([L | R], X, 0, E, [NewL | R]) :-
     set_elem(X, E, L, NewL).
@@ -92,14 +94,26 @@ matrix_set_elem([L | R], X, Y, E, [L | NewR]) :-
     matrix_set_elem(R, X, NewY, E, NewR).
 
 /*
-Converts a character to a number, using its ASCII code
+Checks if the coordinates given in the second and third argument are inside the boundaries
+of the matrix presented in the first argument.
+*/
+inside_matrix([L | R], X, Y) :-
+    X >= 0,
+    length(L, A1),
+    X < A1,
+    Y >= 0,
+    length([L | R], A2),
+    Y < A2.
+
+/*
+Converts a character to a number, using its ASCII code.
 */
 char_to_number(Char, Number) :- 
     char_code(Char, N),
     Number is N - 97.
 
 /*
-Converts a number to a character
+Converts a number to a character.
 */
 number_to_char(Number, Char) :-
     N is Number + 97,
