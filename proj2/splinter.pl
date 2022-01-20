@@ -184,3 +184,33 @@ Game over checker, the game ends when both kings can't reach each other.
 game_over(Board) :-
     find_king(Board, X, Y),
     \+ find_one_king(Board, X, Y).
+
+/*
+Obtains the valid moves at a given moment of the game board.
+*/
+valid_moves(Board, Moves) :- valid_moves(Board, 0, 0, [], Moves).
+valid_moves([L | R], X, Y, R, R) :-
+    length(L, A1), A1 = X,
+    length([L | R], A2), A2 = Y.
+valid_moves([L | R], X, Y, Acc1, Moves) :-
+    length(L, A1), A1 = X,
+    NewY is Y + 1,
+    valid_moves([L | R], 0, NewY, Acc1, Moves).
+valid_moves(Board, X, Y, Acc1, Moves) :-
+    valid_direction(D),
+    \+ member([X-Y,D], Acc1),
+    move(Board, X, Y, D, _),
+    append(Acc1, [[X-Y,D]], Acc2),
+    valid_moves(Board, X, Y, Acc2, Moves).
+valid_moves(Board, X, Y, Acc1, Moves) :-
+    NewX is X + 1,
+    valid_moves(Board, NewX, Y, Acc1, Moves).
+
+valid_direction('N').
+valid_direction('S').
+valid_direction('E').
+valid_direction('O').
+valid_direction('NE').
+valid_direction('NO').
+valid_direction('SE').
+valid_direction('SO').
