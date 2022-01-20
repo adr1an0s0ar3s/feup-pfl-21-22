@@ -148,26 +148,23 @@ surrounding_delta(-1, 0).
 Function that removes the pieces that aren't connected to any king in all directions,
 returns the resultant board in the last argument.
 */
-splinter(Board, NewBoard) :- splinter(Board, 0, 0, Board, NewBoard).
-splinter([L | T], X, Y, R, R) :-
-    length(L, A1),
-    X = A1,
-    length([L | T], A2),
-    Y = A2.
-splinter([L | R], X, Y, Acc1, NewBoard) :-
-    length(L, A1),
-    X = A1,
+splinter(Board, NewBoard) :- splinter(Board, 0, Board, NewBoard).
+splinter([], _, _, []).
+splinter([L | R], Y, StaticBoard, [NewL | NewR]) :-
+    splinter(L, 0, Y, StaticBoard, NewL),
     NewY is Y + 1,
-    splinter([L | R], 0, NewY, Acc1, NewBoard).
-splinter(Board, X, Y, Acc1, NewBoard) :-
-    \+ find_one_king(Board, X, Y),
-    empty(Em),
-    matrix_set_elem(Acc1, X, Y, Em, Acc2),
+    splinter(R, NewY, StaticBoard, NewR).
+
+splinter([], _, _, _, []).
+splinter([H | T], X, Y, StaticBoard, [E | NewT]) :-
+    \+ is_king(H),
+    \+ find_one_king(StaticBoard, X, Y),
+    empty(E),
     NewX is X + 1,
-    splinter(Board, NewX, Y, Acc2, NewBoard). 
-splinter(Board, X, Y, Acc1, NewBoard) :-
+    splinter(T, NewX, Y, StaticBoard, NewT), !.
+splinter([H | T], X, Y, StaticBoard, [H | NewT]) :-
     NewX is X + 1,
-    splinter(Board, NewX, Y, Acc1, NewBoard).    
+    splinter(T, NewX, Y, StaticBoard, NewT).
 
 /*
 Helper function that returns the position of the first king that it finds in the
