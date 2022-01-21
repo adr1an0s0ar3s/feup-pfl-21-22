@@ -13,6 +13,14 @@ is_king(bk).
 is_king(wk).
 
 /*
+Helper function that checks if a given cell can be played by the current player.
+*/
+owns(1, wk).
+owns(1, wp).
+owns(2, bk).
+owns(2, bp).
+
+/*
 Game board, 18x15, it's initialized with these pieces at the center:
 bp (Black Pawn), wp (White Pawn), bk (Black King) and wk (White King).
 */
@@ -40,73 +48,73 @@ Pushes to the right all the elements of the list in the first argument after the
 given in the second argument until an empty, resulting in the list present in the third
 argument.
 */
-push_right([H | T], 0, [Em, H | NewT]) :-
-    \+ empty(H),
+push_right([H | T], Player, 0, [Em, H | NewT]) :-
+    owns(Player, H),
     empty(Em),
     del_elem(Em, T, NewT).
-push_right([H | T], X, [H | NewT]) :-
+push_right([H | T], Player, X, [H | NewT]) :-
     X > 0,
     NewX is X - 1,
-    push_right(T, NewX, NewT).
+    push_right(T, Player, NewX, NewT).
 
 /*
 The following set of functions move a given piece at a certain position to the given
 direction, returning the resultant board in the last argument.
 */
-move([L | R], X, 0, 'E', [NewL | R]) :-
-    push_right(L, X, NewL).
-move([L | R], X, Y, 'E', [L | NewR]) :-
+move([L | R], Player, X, 0, e, [NewL | R]) :-
+    push_right(L, Player, X, NewL).
+move([L | R], Player, X, Y, e, [L | NewR]) :-
     NewY is Y - 1,
-    move(R, X, NewY, 'E', NewR).
+    move(R, Player, X, NewY, e, NewR).
 
-move([L | R], X, 0, 'O', [NewL | R]) :-
+move([L | R], Player, X, 0, o, [NewL | R]) :-
     length(L, A1),
     NewX is A1 - X - 1,
     reverse(L, L1),
-    push_right(L1, NewX, L2),
+    push_right(L1, Player, NewX, L2),
     reverse(L2, NewL).
-move([L | R], X, Y, 'O', [L | NewR]) :-
+move([L | R], Player, X, Y, o, [L | NewR]) :-
     NewY is Y - 1,
-    move(R, X, NewY, 'O', NewR).
+    move(R, Player, X, NewY, o, NewR).
 
-move(Board, X, Y, 'S', NewBoard) :-
+move(Board, Player, X, Y, s, NewBoard) :-
     transpose(Board, B1),
-    move(B1, Y, X, 'E', B2),
+    move(B1, Player, Y, X, e, B2),
     transpose(B2, NewBoard).
 
-move(Board, X, Y, 'N', NewBoard) :-
+move(Board, Player, X, Y, n, NewBoard) :-
     transpose(Board, B1),
-    move(B1, Y, X, 'O', B2),
+    move(B1, Player, Y, X, o, B2),
     transpose(B2, NewBoard).
 
-move(Board, X, Y, 'SE', NewBoard) :-
+move(Board, Player, X, Y, se, NewBoard) :-
     get_diagonal(Board, X, Y, D),
     min_member(A1, [X, Y]),
-    push_right(D, A1, NewD),
+    push_right(D, Player, A1, NewD),
     set_diagonal(Board, X, Y, NewD, NewBoard).
 
-move(Board, X, Y, 'NE', NewBoard) :-
+move(Board, Player, X, Y, ne, NewBoard) :-
     reverse(Board, B1),
     length(Board, A1),
     NewY is A1 - Y - 1,
-    move(B1, X, NewY, 'SE', B2),
+    move(B1, Player, X, NewY, se, B2),
     reverse(B2, NewBoard).
 
-move(Board, X, Y, 'NO', NewBoard) :-
+move(Board, Player, X, Y, no, NewBoard) :-
     get_diagonal(Board, X, Y, Diagonal),
     min_member(Index, [X, Y]),
     reverse(Diagonal, ReverseDiagonal),
     length(Diagonal, Length),
     ReverseIndex is Length - Index - 1,
-    push_right(ReverseDiagonal, ReverseIndex, NewReverseDiagonal),
+    push_right(ReverseDiagonal, Player, ReverseIndex, NewReverseDiagonal),
     reverse(NewReverseDiagonal, NewDiagonal),
     set_diagonal(Board, X, Y, NewDiagonal, NewBoard).
 
-move(Board, X, Y, 'SO', NewBoard) :-
+move(Board, Player, X, Y, so, NewBoard) :-
     reverse(Board, B1),
     length(Board, A1),
     NewY is A1 - Y - 1,
-    move(B1, X, NewY, 'NO', B2),
+    move(B1, Player, X, NewY, no, B2),
     reverse(B2, NewBoard).
 
 /*
@@ -188,29 +196,83 @@ game_over(Board) :-
 /*
 Obtains the valid moves at a given moment of the game board.
 */
-valid_moves(Board, Moves) :- valid_moves(Board, 0, 0, [], Moves).
-valid_moves([L | R], X, Y, R, R) :-
-    length(L, A1), A1 = X,
-    length([L | R], A2), A2 = Y.
-valid_moves([L | R], X, Y, Acc1, Moves) :-
-    length(L, A1), A1 = X,
-    NewY is Y + 1,
-    valid_moves([L | R], 0, NewY, Acc1, Moves).
-valid_moves(Board, X, Y, Acc1, Moves) :-
+valid_moves([L | R], Player, Moves) :-
+    length(L, A1), X is A1 - 1,
+    length([L | R], A2), Y is A2 - 2,
+    valid_moves([L | R], Player, X, Y, [], Moves).
+valid_moves(_, _, 0, 0, R, R).
+valid_moves([L | R], Player, 0, Y, Acc1, Moves) :-
+    length(L, A1), NewX is A1 - 1,
+    NewY is Y - 1,
+    valid_moves([L | R], Player, NewX, NewY, Acc1, Moves).
+valid_moves(Board, Player, X, Y, Acc1, Moves) :-
     valid_direction(D),
-    \+ member([X-Y,D], Acc1),
-    move(Board, X, Y, D, _),
-    append(Acc1, [[X-Y,D]], Acc2),
-    valid_moves(Board, X, Y, Acc2, Moves).
-valid_moves(Board, X, Y, Acc1, Moves) :-
-    NewX is X + 1,
-    valid_moves(Board, NewX, Y, Acc1, Moves).
+    \+ member([X-Y-D], Acc1),
+    move(Board, Player, X, Y, D, _),
+    append([[X-Y-D]], Acc1, Acc2),
+    valid_moves(Board, Player, X, Y, Acc2, Moves).
+valid_moves(Board, Player, X, Y, Acc1, Moves) :-
+    NewX is X - 1,
+    valid_moves(Board, Player, NewX, Y, Acc1, Moves).
+    
+valid_direction(n).
+valid_direction(s).
+valid_direction(e).
+valid_direction(o).
+valid_direction(ne).
+valid_direction(no).
+valid_direction(se).
+valid_direction(so).
 
-valid_direction('N').
-valid_direction('S').
-valid_direction('E').
-valid_direction('O').
-valid_direction('NE').
-valid_direction('NO').
-valid_direction('SE').
-valid_direction('SO').
+change_player(1, 2).
+change_player(2, 1).
+
+play :-
+    display_start_menu,
+    read_option(Player1, Player2),
+    initial_state(_B),
+    game_loop(_B, Player1, Player2, 1).
+
+game_loop(Board, player, player, CurrentPlayer) :-
+    display_game(Board),
+    read_move(Board, X, Y, D),
+    move(Board, CurrentPlayer, X, Y, D, NewBoard1),
+    splinter(NewBoard1, NewBoard2),
+    change_player(CurrentPlayer, NewCurrentPlayer),
+    game_loop(NewBoard2, player, player, NewCurrentPlayer).
+
+game_loop(Board, player, computer, 1) :-
+    display_game(Board),
+    read_move(Board, X, Y, D),
+    move(Board, 1, X, Y, D, NewBoard1),
+    splinter(NewBoard1, NewBoard2),
+    game_loop(NewBoard2, player, computer, 2).
+
+game_loop(Board, player, computer, 2) :- 
+    display_game(Board),
+    choose_move(Board, 0, 1, X, Y, D),
+    move(Board, 2, X, Y, D, NewBoard1),
+    splinter(NewBoard1, NewBoard2),
+    game_loop(NewBoard2, player, computer, 1).
+
+game_loop(Board, computer, player, 1) :-
+    display_game(Board),
+    choose_move(Board, 0, 1, X, Y, D),
+    move(Board, 1, X, Y, D, NewBoard1),
+    splinter(NewBoard1, NewBoard2),
+    game_loop(NewBoard2, computer, player, 2).
+
+game_loop(Board, computer, player, 2) :-
+    display_game(Board),
+    read_move(Board, X, Y, D),
+    move(Board, 2, X, Y, D, NewBoard1),
+    splinter(NewBoard1, NewBoard2),
+    game_loop(NewBoard2, computer, player, 1).
+
+game_loop(Board, computer, computer, currentPlayer) :
+    display_game(Board),
+    choose_move(Board, 0, currentPlayer, X, Y, D),
+    move(Board, currentPlayer, X, Y, D, NewBoard1),
+    splinter(NewBoard1, NewBoard2),
+    change_player(CurrentPlayer, NewCurrentPlayer),
+    game_loop(NewBoard2, computer, computer, NewCurrentPlayer).

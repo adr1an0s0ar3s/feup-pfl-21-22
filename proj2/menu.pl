@@ -17,7 +17,8 @@ display_start_menu :-
     write('   |                                                          |   '),nl,
     write('   |                 1 - PLAYER VS PLAYER                     |   '),nl,
     write('   |                 2 - PLAYER VS COMPUTER                   |   '),nl,
-    write('   |                 3 - COMPUTER VS COMPUTER                 |   '),nl,
+    write('   |                 3 - COMPUTER VS PLAYER                   |   '),nl,
+    write('   |                 4 - COMPUTER VS COMPUTER                 |   '),nl,
     write('   |                                                          |   '),nl,
     write('   |                                                          |   '),nl,
     write('   |                                                          |   '),nl,
@@ -25,18 +26,17 @@ display_start_menu :-
     write('   |                                                          |   '),nl,
     write('   ************************************************************   '),nl.
 
-validate_option(1) :-
+validate_option(1, player, player) :-
     write('Starting game...').
-validate_option(2) :-
+validate_option(2, player, computer) :-
     write('Starting game...').
-validate_option(3) :-
+validate_option(3, computer, player) :-
     write('Starting game...').
-validate_option(_Option) :-
-    write('Please select a valid option:\n'),
-    read(NewOption),
-    validate_option(NewOption).
+validate_option(4, computer, computer) :-
+    write('Starting game...').
 
-read_option :-
-    write('Please select a game mode:\n'),
+read_option(Player1, Player2) :-
+    repeat,
+    write('Please select a valid option:\n'),
     read(Option),
-    validate_option(Option).
+    validate_option(Option, Player1, Player2).

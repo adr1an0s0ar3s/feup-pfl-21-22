@@ -108,7 +108,8 @@ inside_matrix([L | R], X, Y) :-
 /*
 Converts a character to a number, using its ASCII code.
 */
-char_to_number(Char, Number) :- 
+char_to_number(Char, Number) :-
+    \+ integer(Char),
     char_code(Char, N),
     Number is N - 97.
 
@@ -116,5 +117,6 @@ char_to_number(Char, Number) :-
 Converts a number to a character.
 */
 number_to_char(Number, Char) :-
+    integer(Number),
     N is Number + 97,
     char_code(Char, N).
