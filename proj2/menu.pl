@@ -1,3 +1,6 @@
+/*
+Displays the starting menu.
+*/
 display_start_menu :-
     nl,
     write('   ************************************************************   '),nl,
@@ -26,15 +29,35 @@ display_start_menu :-
     write('   |                                                          |   '),nl,
     write('   ************************************************************   '),nl.
 
+/*
+Validates the option chosen by the user and returns the players accordingly.
+*/
 validate_option(1, player, player) :-
-    write('Starting game...').
-validate_option(2, player, computer) :-
-    write('Starting game...').
-validate_option(3, computer, player) :-
-    write('Starting game...').
-validate_option(4, computer, computer) :-
-    write('Starting game...').
+    write('Starting game...'),
+    sleep(2).
+validate_option(2, player, AIDifficulty) :-
+    read_ai_difficulty(AIDifficulty),
+    write('Starting game...'),
+    sleep(2).
+validate_option(3, AIDifficulty, player) :-
+    read_ai_difficulty(AIDifficulty),
+    write('Starting game...'),
+    sleep(2).
+validate_option(4, AIDifficulty1, AIDifficulty2) :-
+    read_ai_difficulty(AIDifficulty1),
+    read_ai_difficulty(AIDifficulty2),
+    write('Starting game...'),
+    sleep(2).
 
+read_ai_difficulty(AIDifficulty) :-
+    repeat,
+    write('Please select a valid AI difficulty (0 or 1):\n'),
+    read(AIDifficulty),
+    AIDifficulty >= 0, AIDifficulty =< 1.
+
+/*
+Reads user input and returns the respective players if it is a valid option.
+*/
 read_option(Player1, Player2) :-
     repeat,
     write('Please select a valid option:\n'),

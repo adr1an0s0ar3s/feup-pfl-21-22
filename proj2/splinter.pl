@@ -1,10 +1,55 @@
 :- use_module(library(lists)).
+:- use_module(library(random)).
 :- [utils].
+
+play :-
+    repeat,
+    display_start_menu,
+    read_option(Player1, Player2),
+    initial_state(InitialBoard),
+    game_loop(InitialBoard, [Player1, Player2], 0).
+
+game_loop(Board, Players, _) :-
+    game_over(Board),
+    display_game(Board),
+    winner(Board, Turn),
+    nth0(Turn, Players, Player),
+    display_winner(Player, Turn),
+    read(_),
+    play.
+
+game_loop(Board, Players, Turn) :-
+    display_game(Board),
+    display_turn(Turn),
+    nth0(Turn, Players, Player),
+    get_move(Board, Player, Turn, X, Y, D),
+    move(Board, Turn, X, Y, D, UnsplinteredBoard),
+    splinter(UnsplinteredBoard, NewBoard),
+    NewTurn is 1 - Turn,
+    game_loop(NewBoard, Players, NewTurn).
+
+get_move(Board, player, _, X, Y, D) :-
+    read_move(Board, X, Y, D).
+
+get_move(Board, AIDifficulty, Turn, X, Y, D) :-
+    choose_move(Board, AIDifficulty, Turn, X, Y, D),
+    display_ai_move(X, Y, D).
+
+winner(Board, Player) :-
+    count_group_pieces(Board, WhiteCount, BlackCount),
+    winner_aux(Player, WhiteCount, BlackCount).
+
+winner_aux(0, WhiteCount, BlackCount) :-
+    WhiteCount > BlackCount.
+winner_aux(1, WhiteCount, BlackCount) :-
+    WhiteCount < BlackCount.
+winner_aux(-1, WhiteCount, BlackCount) :-
+    WhiteCount = BlackCount.
 
 /*
 Definition of empty cell for ease of change if needed.
 */
-empty(<>).  % To DEBUG change it to 'empty(empty).'
+empty(<>).
 
 /*
 Helper function that checks if a given cell content is one of the kings.
@@ -15,10 +60,10 @@ is_king(wk).
 /*
 Helper function that checks if a given cell can be played by the current player.
 */
-owns(1, wk).
-owns(1, wp).
-owns(2, bk).
-owns(2, bp).
+owns(0, wk).
+owns(0, wp).
+owns(1, bk).
+owns(1, bp).
 
 /*
 Game board, 18x15, it's initialized with these pieces at the center:
@@ -122,14 +167,14 @@ The following set of functions try to find a king beggining in a given position
 by performing a depth-first search. If the starting position is already a king
 the function will ignore it and it'll try to find the opponent's king.
 */
-find_one_king(Board, X, Y) :-
-    find_one_king(Board, X, Y, [X-Y]).
+find_a_king(Board, X, Y, King) :-
+    find_a_king(Board, X, Y, [X-Y], King).
 
-find_one_king(Board, X, Y, [_, _ | _]) :-   % Verifying that the element is a BK, WK or an empty
+find_a_king(Board, X, Y, [_, _ | _], E) :-   % Verifying that the element is a BK, WK or an empty
     matrix_get_elem(Board, X, Y, E),
     is_king(E).
 
-find_one_king(Board, X, Y, V) :-            % Searching BK and WK in neighbours
+find_a_king(Board, X, Y, V, King) :-            % Searching BK and WK in neighbours
     surrounding_delta(DeltaX, DeltaY),
     NewX is X + DeltaX,
     NewY is Y + DeltaY,
@@ -137,7 +182,7 @@ find_one_king(Board, X, Y, V) :-            % Searching BK and WK in neighbours
     \+ member(NewX-NewY, V),
     matrix_get_elem(Board, NewX, NewY, E),
     \+ empty(E),
-    find_one_king(Board, NewX, NewY, [NewX-NewY | V]).
+    find_a_king(Board, NewX, NewY, [NewX-NewY | V], King).
 
 /*
 Helper function that returns the delta to sum to the coordinates resulting in all
@@ -166,7 +211,7 @@ splinter([L | R], Y, StaticBoard, [NewL | NewR]) :-
 splinter([], _, _, _, []).
 splinter([H | T], X, Y, StaticBoard, [E | NewT]) :-
     \+ is_king(H),
-    \+ find_one_king(StaticBoard, X, Y),
+    \+ find_a_king(StaticBoard, X, Y, _),
     empty(E),
     NewX is X + 1,
     splinter(T, NewX, Y, StaticBoard, NewT), !.
@@ -178,43 +223,47 @@ splinter([H | T], X, Y, StaticBoard, [H | NewT]) :-
 Helper function that returns the position of the first king that it finds in the
 board presented in the first argument.
 */
-find_king(Board, X, Y) :- find_king(Board, 0, X, Y).
-find_king([L | _], Y, X, Y) :-
+get_king_position(Board, X, Y) :- get_king_position(Board, 0, X, Y).
+get_king_position([L | _], Y, X, Y) :-
     nth0(X, L, E),
     is_king(E).
-find_king([_ | R], Acc1, X, Y) :-
+get_king_position([_ | R], Acc1, X, Y) :-
     Acc2 is Acc1 + 1,
-    find_king(R, Acc2, X, Y).
+    get_king_position(R, Acc2, X, Y).
 
 /*
 Game over checker, the game ends when both kings can't reach each other.
 */
 game_over(Board) :-
-    find_king(Board, X, Y),
-    \+ find_one_king(Board, X, Y).
+    get_king_position(Board, X, Y),
+    \+ find_a_king(Board, X, Y, _).
 
 /*
 Obtains the valid moves at a given moment of the game board.
 */
-valid_moves([L | R], Player, Moves) :-
-    length(L, A1), X is A1 - 1,
-    length([L | R], A2), Y is A2 - 1,
-    valid_moves([L | R], Player, X, Y, [], Moves).
-valid_moves(_, _, 0, 0, R, R).
-valid_moves([L | R], Player, 0, Y, Acc1, Moves) :-
-    length(L, A1), NewX is A1 - 1,
+valid_moves(Board, Player, Moves) :-
+    matrix_size(Board, A1, A2),
+    X is A1 - 1, Y is A2 - 1,
+    valid_moves(Board, Player, X, Y, [], Moves).
+valid_moves(_, _, -1, 0, R, R).
+valid_moves(Board, Player, -1, Y, Acc1, Moves) :-
+    matrix_size(Board, A1, _),
+    X is A1 - 1,
     NewY is Y - 1,
-    valid_moves([L | R], Player, NewX, NewY, Acc1, Moves).
+    valid_moves(Board, Player, X, NewY, Acc1, Moves).
 valid_moves(Board, Player, X, Y, Acc1, Moves) :-
     valid_direction(D),
-    \+ member([X-Y-D], Acc1),
+    \+ member(X-Y-D, Acc1),
     move(Board, Player, X, Y, D, _),
-    append([[X-Y-D]], Acc1, Acc2),
+    append([X-Y-D], Acc1, Acc2),
     valid_moves(Board, Player, X, Y, Acc2, Moves).
 valid_moves(Board, Player, X, Y, Acc1, Moves) :-
     NewX is X - 1,
     valid_moves(Board, Player, NewX, Y, Acc1, Moves).
-    
+
+/*
+Valid directions.
+*/    
 valid_direction(n).
 valid_direction(s).
 valid_direction(e).
@@ -224,83 +273,52 @@ valid_direction(no).
 valid_direction(se).
 valid_direction(so).
 
-change_player(1, 2).
-change_player(2, 1).
-
-play :-
-    display_start_menu,
-    read_option(Player1, Player2),
-    initial_state(_B),
-    game_loop(_B, Player1, Player2, 1).
-
-game_loop(Board, player, player, CurrentPlayer) :-
-    display_game(Board),
-    read_move(Board, X, Y, D),
-    move(Board, CurrentPlayer, X, Y, D, NewBoard1),
-    splinter(NewBoard1, NewBoard2),
-    change_player(CurrentPlayer, NewCurrentPlayer),
-    game_loop(NewBoard2, player, player, NewCurrentPlayer).
-
-game_loop(Board, player, computer, 1) :-
-    display_game(Board),
-    read_move(Board, X, Y, D),
-    move(Board, 1, X, Y, D, NewBoard1),
-    splinter(NewBoard1, NewBoard2),
-    game_loop(NewBoard2, player, computer, 2).
-
-game_loop(Board, player, computer, 2) :- 
-    display_game(Board),
-    choose_move(Board, 0, 1, X, Y, D),
-    move(Board, 2, X, Y, D, NewBoard1),
-    splinter(NewBoard1, NewBoard2),
-    game_loop(NewBoard2, player, computer, 1).
-
-game_loop(Board, computer, player, 1) :-
-    display_game(Board),
-    choose_move(Board, 0, 1, X, Y, D),
-    move(Board, 1, X, Y, D, NewBoard1),
-    splinter(NewBoard1, NewBoard2),
-    game_loop(NewBoard2, computer, player, 2).
-
-game_loop(Board, computer, player, 2) :-
-    display_game(Board),
-    read_move(Board, X, Y, D),
-    move(Board, 2, X, Y, D, NewBoard1),
-    splinter(NewBoard1, NewBoard2),
-    game_loop(NewBoard2, computer, player, 1).
-
-game_loop(Board, computer, computer, currentPlayer) :
-    display_game(Board),
-    choose_move(Board, 0, currentPlayer, X, Y, D),
-    move(Board, currentPlayer, X, Y, D, NewBoard1),
-    splinter(NewBoard1, NewBoard2),
-    change_player(CurrentPlayer, NewCurrentPlayer),
-    game_loop(NewBoard2, computer, computer, NewCurrentPlayer).
+/*
+Function that evaluates the current state of the board and returns a value
+that can be negative or positive. If it's high it means that the player
+given has a better chance of winning, if it's low it means that it'll probably
+lose. Value 0 means that it's a draw at the moment (can be tested with the
+initial board).
+*/
+value(Board, Player, Value) :-
+    evaluate(Board, Player, PlayerValue),
+    Opponent is 1 - Player,
+    evaluate(Board, Opponent, OpponentValue),
+    Value is PlayerValue - OpponentValue.
 
 /*
 Function that evaluates the current state of the board for a given player,
-it returns the sum of the number of links that the player's pieces
-have with the main group containing the two kings.
+it returns the sum of the number of links that the player's pieces have with
+the main group containing the two kings.
 */
-value(Board, Player, Value) :-
-    matrix_size(Board, X, Y),
-    value(Board, Player, X, Y, 0, Value).
-value(_, _, 0, 0, R, R).
-value(Board, Player, -1, Y, Acc1, Value) :-
-    matrix_size(Board, X, _),
+evaluate(Board, Player, Value) :-
+    matrix_size(Board, A1, A2),
+    X is A1 - 1, Y is A2 - 1,
+    evaluate(Board, Player, X, Y, 0, Value).
+evaluate(_, _, -1, 0, R, R) :- !.
+evaluate(Board, Player, -1, Y, Acc1, Value) :-
+    matrix_size(Board, A1, _),
+    X is A1 - 1,
     NewY is Y - 1,
-    value(Board, Player, X, NewY, Acc1, Value).
-value(Board, Player, X, Y, Acc1, Value) :-
+    evaluate(Board, Player, X, NewY, Acc1, Value).
+evaluate(Board, Player, X, Y, Acc1, Value) :-
+    inside_matrix(Board, X, Y),
     matrix_get_elem(Board, X, Y, E),
     owns(Player, E),
     link_count(Board, X, Y, A1),
     Acc2 is Acc1 + A1,
     NewX is X - 1,
-    value(Board, Player, NewX, Y, Acc2, Value).
-value(Board, Player, X, Y, Acc1, Value) :-
+    evaluate(Board, Player, NewX, Y, Acc2, Value).
+evaluate(Board, Player, X, Y, Acc1, Value) :-
+    inside_matrix(Board, X, Y),
     NewX is X - 1,
-    value(Board, Player, NewX, Y, Acc1, Value).
+    evaluate(Board, Player, NewX, Y, Acc1, Value).
 
+/*
+Function that counts the number of connections that a given position has
+with it's surroundings (the higher the value, the less probable it is to
+splinter it).
+*/
 link_count(Board, X, Y, Value) :- link_count(Board, X, Y, [], 0, Value).
 link_count(_, _, _, VisitedDirections, R, R) :-
     length(VisitedDirections, 8).
@@ -319,3 +337,71 @@ link_count(Board, X, Y, VisitedDirections, Acc1, Value) :-
     \+ member(DeltaX-DeltaY, VisitedDirections),
     append(VisitedDirections, [DeltaX-DeltaY], NewVisitedDirections),
     link_count(Board, X, Y, NewVisitedDirections, Acc1, Value).
+
+/*
+Function that simulates a play, returns the move. It has two difficulties:
+difficulty 0 means that it'll play a random valid move; in difficulty 1 it'll
+calculate the move that'll increase the number of connections between it's
+pieces.
+*/
+choose_move(Board, 0, Player, X, Y, D) :-
+    valid_moves(Board, Player, Moves),
+    random_member(X-Y-D, Moves).
+choose_move(Board, 1, Player, X, Y, D) :-
+    valid_moves(Board, Player, Moves),
+    best_moves(Board, Player, Moves, BestMoves),
+    random_member(X-Y-D, BestMoves).
+
+/*
+Function that returns the array of moves that have the highest value returned
+by the value function above.
+*/
+best_moves(Board, Player, Moves, BestMoves) :- best_moves(Board, Player, Moves, -1000000, [], BestMoves).
+best_moves(_, _, [], _, R, R).
+best_moves(Board, Player, [X-Y-D | T], BestValue, Acc1, BestMoves) :-
+    move(Board, Player, X, Y, D, NewBoard),
+    value(NewBoard, Player, Value),
+    best_moves_aux(X-Y-D, Value, BestValue, Acc1, NewBestValue, Acc2),
+    best_moves(Board, Player, T, NewBestValue, Acc2, BestMoves).
+
+best_moves_aux(Move, Value, BestValue, _, Value, NewBestMoves) :-
+    Value > BestValue,
+    append([], [Move], NewBestMoves).
+best_moves_aux(Move, Value, BestValue, CurrentBestMoves, BestValue, NewBestMoves) :-
+    Value == BestValue,
+    append(CurrentBestMoves, [Move], NewBestMoves).
+best_moves_aux(_, Value, BestValue, CurrentBestMoves, BestValue, CurrentBestMoves) :-
+    Value < BestValue.
+
+/*
+IMPORTANT NOTE: This function should only be used after a GAME OVER!
+Function that returns the number of pieces connected to the white and black king. It's
+utilized in the game over state to obtain the winner, the player with the most amount
+of pieces wins. It's not advised to not be used whenever it's not a game over state
+because it'll return an incorrect reading (because the two kings are in the same group).
+*/
+count_group_pieces(Board, WhiteCount, BlackCount) :-
+    matrix_size(Board, W, H),
+    X is W - 1, Y is H - 1,
+    count_group_pieces(Board, X, Y, 0, 0, WhiteCount, BlackCount).
+count_group_pieces(_, -1, 0, WhiteCount, BlackCount, WhiteCount, BlackCount).
+count_group_pieces(Board, -1, Y, Acc1, Acc2, WhiteCount, BlackCount) :-
+    matrix_size(Board, W, _),
+    NewX is W - 1, NewY is Y - 1,
+    count_group_pieces(Board, NewX, NewY, Acc1, Acc2, WhiteCount, BlackCount).
+count_group_pieces(Board, X, Y, Acc1, Acc2, WhiteCount, BlackCount) :-
+    matrix_get_elem(Board, X, Y, E),
+    \+ empty(E),
+    \+ is_king(E),
+    find_a_king(Board, X, Y, King),
+    increment_group_count(King, Acc1, Acc2, Acc3, Acc4),
+    NewX is X - 1,
+    count_group_pieces(Board, NewX, Y, Acc3, Acc4, WhiteCount, BlackCount).
+count_group_pieces(Board, X, Y, Acc1, Acc2, WhiteCount, BlackCount) :-
+    NewX is X - 1,
+    count_group_pieces(Board, NewX, Y, Acc1, Acc2, WhiteCount, BlackCount).
+
+increment_group_count(wk, WhiteCount, BlackCount, NewWhiteCount, BlackCount) :-
+    NewWhiteCount is WhiteCount + 1.
+increment_group_count(bk, WhiteCount, BlackCount, WhiteCount, NewBlackCount) :-
+    NewBlackCount is BlackCount + 1.
