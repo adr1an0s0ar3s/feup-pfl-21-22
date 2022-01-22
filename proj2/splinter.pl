@@ -198,7 +198,7 @@ Obtains the valid moves at a given moment of the game board.
 */
 valid_moves([L | R], Player, Moves) :-
     length(L, A1), X is A1 - 1,
-    length([L | R], A2), Y is A2 - 2,
+    length([L | R], A2), Y is A2 - 1,
     valid_moves([L | R], Player, X, Y, [], Moves).
 valid_moves(_, _, 0, 0, R, R).
 valid_moves([L | R], Player, 0, Y, Acc1, Moves) :-
@@ -276,3 +276,46 @@ game_loop(Board, computer, computer, currentPlayer) :
     splinter(NewBoard1, NewBoard2),
     change_player(CurrentPlayer, NewCurrentPlayer),
     game_loop(NewBoard2, computer, computer, NewCurrentPlayer).
+
+/*
+Function that evaluates the current state of the board for a given player,
+it returns the sum of the number of links that the player's pieces
+have with the main group containing the two kings.
+*/
+value(Board, Player, Value) :-
+    matrix_size(Board, X, Y),
+    value(Board, Player, X, Y, 0, Value).
+value(_, _, 0, 0, R, R).
+value(Board, Player, -1, Y, Acc1, Value) :-
+    matrix_size(Board, X, _),
+    NewY is Y - 1,
+    value(Board, Player, X, NewY, Acc1, Value).
+value(Board, Player, X, Y, Acc1, Value) :-
+    matrix_get_elem(Board, X, Y, E),
+    owns(Player, E),
+    link_count(Board, X, Y, A1),
+    Acc2 is Acc1 + A1,
+    NewX is X - 1,
+    value(Board, Player, NewX, Y, Acc2, Value).
+value(Board, Player, X, Y, Acc1, Value) :-
+    NewX is X - 1,
+    value(Board, Player, NewX, Y, Acc1, Value).
+
+link_count(Board, X, Y, Value) :- link_count(Board, X, Y, [], 0, Value).
+link_count(_, _, _, VisitedDirections, R, R) :-
+    length(VisitedDirections, 8).
+link_count(Board, X, Y, VisitedDirections, Acc1, Value) :-
+    surrounding_delta(DeltaX, DeltaY),
+    \+ member(DeltaX-DeltaY, VisitedDirections),
+    NewX is X + DeltaX, NewY is Y + DeltaY,
+    inside_matrix(Board, NewX, NewY),
+    matrix_get_elem(Board, NewX, NewY, E),
+    \+ empty(E),
+    append(VisitedDirections, [DeltaX-DeltaY], NewVisitedDirections),
+    Acc2 is Acc1 + 1,
+    link_count(Board, X, Y, NewVisitedDirections, Acc2, Value).
+link_count(Board, X, Y, VisitedDirections, Acc1, Value) :-
+    surrounding_delta(DeltaX, DeltaY),
+    \+ member(DeltaX-DeltaY, VisitedDirections),
+    append(VisitedDirections, [DeltaX-DeltaY], NewVisitedDirections),
+    link_count(Board, X, Y, NewVisitedDirections, Acc1, Value).

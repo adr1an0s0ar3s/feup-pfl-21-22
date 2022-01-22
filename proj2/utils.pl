@@ -106,6 +106,11 @@ inside_matrix([L | R], X, Y) :-
     Y < A2.
 
 /*
+Returns the width and height of the matrix given in the first argument.
+*/
+matrix_size([L | R], Width, Height) :- length(L, Width), length([L | R], Height).
+
+/*
 Converts a character to a number, using its ASCII code.
 */
 char_to_number(Char, Number) :-
