@@ -1,3 +1,6 @@
+:- use_module(library(system)).
+:- [utils].
+
 /*
 Displays the starting menu.
 */
@@ -30,36 +33,74 @@ display_start_menu :-
     write('   ************************************************************   '),nl.
 
 /*
-Validates the option chosen by the user and returns the players accordingly.
+Displays the "Starting Game..." animation.
 */
-validate_option(1, player, player) :-
-    write('Starting game...'),
-    sleep(2).
-validate_option(2, player, AIDifficulty) :-
-    read_ai_difficulty(AIDifficulty),
-    write('Starting game...'),
-    sleep(2).
-validate_option(3, AIDifficulty, player) :-
-    read_ai_difficulty(AIDifficulty),
-    write('Starting game...'),
-    sleep(2).
-validate_option(4, AIDifficulty1, AIDifficulty2) :-
-    read_ai_difficulty(AIDifficulty1),
-    read_ai_difficulty(AIDifficulty2),
-    write('Starting game...'),
-    sleep(2).
-
-read_ai_difficulty(AIDifficulty) :-
-    repeat,
-    write('Please select a valid AI difficulty (0 or 1):\n'),
-    read(AIDifficulty),
-    AIDifficulty >= 0, AIDifficulty =< 1.
+display_starting_game_animation :- write('Starting game'), sleep(0.5), write('.'), sleep(0.5), write('.'), sleep(0.5), write('.'), sleep(0.5).
 
 /*
-Reads user input and returns the respective players if it is a valid option.
+Displays the matrix given as argument with column and row identification.
 */
-read_option(Player1, Player2) :-
-    repeat,
-    write('Please select a valid option:\n'),
-    read(Option),
-    validate_option(Option, Player1, Player2).
+display_game([L | R]) :-
+    nl,
+    length(L, X),
+    display_header(X),
+    nl, nl,
+    display_matrix([L | R]).
+
+/*
+Displays collumn identification by characters.
+*/
+display_header(X) :- display_header(X, 0).
+display_header(X, X) :- !.
+display_header(X, Acc1) :-
+    number_to_char(Acc1, Char),
+    write('    '), write(Char),
+    Acc2 is Acc1 + 1,
+    display_header(X, Acc2).
+
+/*
+Displays the matrix given as argument.
+*/
+display_matrix(Board) :- display_matrix(Board, 0).
+display_matrix([], _).
+display_matrix([L | R], Acc1) :-
+    Acc1 < 10,
+    write(Acc1), write('   '),
+    display_line(L), nl, nl,
+    Acc2 is Acc1 + 1,
+    display_matrix(R, Acc2).
+display_matrix([L | R], Acc1) :-
+    Acc1 >= 10,
+    write(Acc1), write('  '),
+    display_line(L), nl, nl,
+    Acc2 is Acc1 + 1,
+    display_matrix(R, Acc2).
+
+/*
+Displays the matrix line (list) given as argument.
+*/
+display_line([]).
+display_line([H | T]) :-
+    write(H),
+    write('   '),
+    display_line(T).
+
+/*
+Displays the colour of the pieces of the current turn.
+*/
+display_turn(0) :- write('White\'s turn.\n').
+display_turn(1) :- write('Black\'s turn.\n').
+
+/*
+Displays an AI move.
+*/
+display_ai_move(X, Y, D) :-
+    number_to_char(X, C),
+    write('The AI chooses to move:\n'),
+    sleep(1), write(C-Y-D), sleep(3), nl.
+
+/*
+Displays the winner of the game.
+*/
+display_winner(0) :- write('White pieces\'s win!\n').
+display_winner(1) :- write('Black pieces\'s win!\n').

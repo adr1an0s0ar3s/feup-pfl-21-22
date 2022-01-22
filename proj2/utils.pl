@@ -1,6 +1,18 @@
 :- use_module(library(lists)).
 
 /*
+Valid directions.
+*/    
+valid_direction(n).
+valid_direction(s).
+valid_direction(e).
+valid_direction(o).
+valid_direction(ne).
+valid_direction(no).
+valid_direction(se).
+valid_direction(so).
+
+/*
 Removes the first instance of the first argument in the list of the second argument
 resulting in the list present in the third argument.
 */

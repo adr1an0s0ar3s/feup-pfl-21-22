@@ -1,7 +1,13 @@
 :- use_module(library(lists)).
 :- use_module(library(random)).
 :- [utils].
+:- [output].
+:- [input].
 
+/*
+Function responsible for initializing the game, displays the start menu, reads
+the option(s) and starts the game loop.
+*/
 play :-
     repeat,
     display_start_menu,
@@ -9,13 +15,19 @@ play :-
     initial_state(InitialBoard),
     game_loop(InitialBoard, [Player1, Player2], 0).
 
-game_loop(Board, Players, _) :-
+/*
+Game loop, function mainly responsible for displaying the game board and inquiring
+the user/AI for a move to be played, it checks if the move is valid and, if it is,
+plays it and checks if any splinter has occured. Additionally, checks if a game over
+has occured and displays the final game board and winner. After an arbitrary input it
+returns to the main menu.
+*/
+game_loop(Board, _, _) :-
     game_over(Board),
     display_game(Board),
-    winner(Board, Turn),
-    nth0(Turn, Players, Player),
-    display_winner(Player, Turn),
-    read(_),
+    winner(Board, Player),
+    display_winner(Player),
+    input_to_continue,
     play.
 
 game_loop(Board, Players, Turn) :-
@@ -28,13 +40,23 @@ game_loop(Board, Players, Turn) :-
     NewTurn is 1 - Turn,
     game_loop(NewBoard, Players, NewTurn).
 
+/*
+Auxiliary function that handles the inquiring of the move to be made, if it's a
+player's turn it ask for an input, if it's the AI's turn it calculates the move
+depending on the AI difficulty choosen in play/0.
+*/
 get_move(Board, player, _, X, Y, D) :-
     read_move(Board, X, Y, D).
 
 get_move(Board, AIDifficulty, Turn, X, Y, D) :-
     choose_move(Board, AIDifficulty, Turn, X, Y, D),
-    display_ai_move(X, Y, D).
+    display_ai_move(X, Y, D).   % DEBUG: To test the AI's difficulty difference more easily we can comment this line and play a AI vs AI game with different difficulties.
 
+/*
+IMPORTANT NOTE: This function should only be called after a game over.
+Function that determines the winner after checking if a game over has occured
+by comparing the number of pieces in the same group as the corresponding king.
+*/
 winner(Board, Player) :-
     count_group_pieces(Board, WhiteCount, BlackCount),
     winner_aux(Player, WhiteCount, BlackCount).
@@ -260,18 +282,6 @@ valid_moves(Board, Player, X, Y, Acc1, Moves) :-
 valid_moves(Board, Player, X, Y, Acc1, Moves) :-
     NewX is X - 1,
     valid_moves(Board, Player, NewX, Y, Acc1, Moves).
-
-/*
-Valid directions.
-*/    
-valid_direction(n).
-valid_direction(s).
-valid_direction(e).
-valid_direction(o).
-valid_direction(ne).
-valid_direction(no).
-valid_direction(se).
-valid_direction(so).
 
 /*
 Function that evaluates the current state of the board and returns a value
