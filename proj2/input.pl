@@ -21,10 +21,10 @@ Validates the AIDifficulty chosen by the user.
 */
 read_ai_difficulty(AIDifficulty) :-
     repeat,
-    write('Please select a valid AI difficulty (0 or 1):\n'),
+    write('Please select a valid AI difficulty (1 or 2):\n'),
     read(AIDifficulty),
     integer(AIDifficulty),
-    AIDifficulty >= 0, AIDifficulty =< 1.
+    AIDifficulty >= 1, AIDifficulty =< 2.
 
 /*
 Reads user input and returns the respective players if it is a valid option.

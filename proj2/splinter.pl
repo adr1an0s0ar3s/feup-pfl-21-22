@@ -49,8 +49,8 @@ get_move(Board, player, _, X, Y, D) :-
     read_move(Board, X, Y, D).
 
 get_move(Board, AIDifficulty, Turn, X, Y, D) :-
-    choose_move(Board, AIDifficulty, Turn, X, Y, D),
-    display_ai_move(X, Y, D).   % DEBUG: To test the AI's difficulty difference more
+    choose_move(Board, AIDifficulty, Turn, X, Y, D).
+    %display_ai_move(X, Y, D).   % DEBUG: To test the AI's difficulty difference more
                                 % easily we can comment this line and play a AI vs AI
                                 % game with different difficulties.
 
@@ -352,14 +352,14 @@ link_count(Board, X, Y, VisitedDirections, Acc1, Value) :-
 
 /*
 Function that simulates a play, returns the move. It has two difficulties:
-difficulty 0 means that it'll play a random valid move; in difficulty 1 it'll
+difficulty 1 means that it'll play a random valid move; in difficulty 2 it'll
 calculate the move that'll increase the number of connections between it's
 pieces.
 */
-choose_move(Board, 0, Player, X, Y, D) :-
+choose_move(Board, 1, Player, X, Y, D) :-
     valid_moves(Board, Player, Moves),
     random_member(X-Y-D, Moves).
-choose_move(Board, 1, Player, X, Y, D) :-
+choose_move(Board, 2, Player, X, Y, D) :-
     valid_moves(Board, Player, Moves),
     best_moves(Board, Player, Moves, BestMoves),
     random_member(X-Y-D, BestMoves).
