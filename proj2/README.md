@@ -1,4 +1,15 @@
-# <u>Trabalho Prático #2 - Splinter Board Game</u>
+# Trabalho Prático #2 - Splinter Board Game
+
+## Grupo Splinter_1
+
+| Elementos                                                 | Percentagem |
+| --------------------------------------------------------- | :---------: |
+| Adriano Filipe Ribeiro Soares (<up201904873@up.pt>)       |     50%     |
+| Vasco Marinho Rodrigues Gomes Alves (<up201808031@up.pt>) |     50%     |
+
+## Instalação e Execução
+
+O nosso projeto está dividido por quatro módulos distintos: `splinter`, `output`, `input` e `utils`. Todos estes têm as inclusões necessárias em cabeçalho de modo a executá-los individualmente, no entanto, é recomendável executar apenas o módulo `splinter` que incluí todos os módulos necessários para a execução do jogo. O jogo é inicializado através do predicado `play/0` presente no módulo `splinter`.
 
 ## Descrição do Jogo
 
@@ -215,13 +226,3 @@
 ## Conclusões
 
 O trabalho teve como objetivo aplicar os conceitos assimilados na segunda metade da Unidade Curricular de Programação Funcional e em Lógica, através da utilização da linguagem Prolog. Concluímos que o trabalho foi realizado com sucesso e a sua realização foi uma mais valia quer para a consolidação dos temas apresentados na unidade curricular, quer para o nosso futuro como engenheiros.
-
----
-
-#### Grupo Splinter_1
-
-| Elementos                                                 | Percentagem |
-| --------------------------------------------------------- | :---------: |
-| Adriano Filipe Ribeiro Soares (<up201904873@up.pt>)       |     50%     |
-| Vasco Marinho Rodrigues Gomes Alves (<up201808031@up.pt>) |     50%     |
-
