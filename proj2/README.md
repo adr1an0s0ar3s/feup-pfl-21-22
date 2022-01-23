@@ -175,39 +175,41 @@
 - <u>**Execução de Jogadas**</u>:
   - Inicialmente é verificado se a jogada introduzida pelo utilizador é válida através do predicado `read_move/4` do módulo `input`. É necessário verificar se a posição escolhida existe no tabuleiro (`inside_matrix/3` do módulo `utils`) e se a direção do movimento é válida (`valid_direction/1` do módulo `utils`). O formato do movimento a ser introduzido é `X-Y-D` no qual `X` é um carácter que simboliza uma coluna, `Y` é um inteiro que simboliza uma linha e `D` é a direção da jogada podendo esta ser `n, ne, e, se, s, so, o, no`. A nosso ver é uma forma fácil, rápida e intuitiva do jogador introduzir a jogada que pretende.
   - Após o utilizador introduzir um jogada válida, a mesma é realizada através do predicado `move/6`, que por sua vez chama o predicado `push_right/4`.  De modo a facilitar a implementação do jogo apenas foi implementado o movimento para a direção **Este** (`push_right/4`). Deste modo, para mover em qualquer outra direção é apenas necessário efetuar transformações ao nível do tabuleiro ou ao nível da linha (auxílio das funções `reverse/2`, `transpose/2` e `nth0/3`do módulo `lists` do SICStus, as quais serviram de base para muitas funções auxiliares presentes no nosso módulo `utils`), executar o predicado `push_right/4` e reverter as transformações efetuadas anteriormente.
+  - Após a realização da jogada é necessário testar a ocorrência de *splinter* com o predicado `splinter/2` do módulo `splinter` que recebe o estado atual do tabuleiro e retorna um novo tabuleiro potencialmente modificado sem as peças que se encontravam desconectadas de ambos os reis. Este predicado é auxiliado por `find_a_king/4`, que, como o nome indica, tenta encontrar um rei a partir de uma dada posição, caso não seja encontrado nenhum `splinter` ocorreu. É, sem dúvida, um dos predicados mais complexos deste projeto (para além de `value/3`) dado que é necessário realizar uma pesquisa em profundidade a todo o tabuleiro.
   
 - <u>**Final de Jogo**</u>:
   - Após cada jogada é necessário verificar se o fim de jogo foi originado através do *splinter* de um dos reis através do predicado `game_over/1`. Caso o fim de jogo seja alcançado o predicado `winner/2` é executado de forma a obter o vencedor mediante as peças no grupo do rei de cada jogador.
-  - **NOTA**: No jogo por nós implementado um rei nunca será alvo de *splinter*, deste modo um jogador nunca poderá ficar sem peças para jogar, assim, de forma a acabar o jogo o rei tem de ativamente sair do grupo do rei oponente para o jogo finalizar. O vencedor será o correto, dado que o jogador não possui peças e consequentemente possui menos ou igual número de peças do oponente.
+  - O predicado `game_over/1` é auxiliado pelos predicados `get_king_position/3` e `find_a_king/4`. Após encontrar um rei qualquer caso não seja possível a partir desse rei encontrar o rei oponente o jogo acaba.
+  - **NOTA**: Um rei nunca será alvo de *splinter*, deste modo, um jogador nunca poderá ficar sem peças para jogar, assim, o rei tem de ativamente sair do grupo do rei oponente para o jogo finalizar. O vencedor será o correto, dado que o jogador não possui peças e consequentemente possui menos ou igual número de peças do oponente.
   
 - <u>**Lista de Jogadas Válidas**</u>:
   - Implementamos o predicado `valid_moves/3` (módulo `splinter`) que retorna todos as jogadas possíveis numa lista com elementos no formato `X-Y-D` acima descrito. É utilizado na IA de nível 1 e 2.
   
 - <u>**Avaliação do Estado do Jogo**</u>:
   
-  - Está presente no módulo `splinter` o predicado `value/3`, que, mediante o jogador, analisa o atual tabuleiro de jogo e retorna um valor que quanto mais alto for melhor é a possibilidade de este vencer. Este valor pode também ser 0, indicando que os jogadores atualmente estão empatados, e negativo, indicando que o jogador está a perder de momento. É de notar que, caso o mesmo tabuleiro de jogo seja inserido como argumento desta função mas o jogador seja diferente os valores obtidos serão simétricos.
+  - Está presente no módulo `splinter` o predicado `value/3`, que, mediante o jogador, analisa o atual tabuleiro de jogo e retorna um valor que quanto mais alto for melhor é a possibilidade de este vencer. Este valor pode também ser 0, indicando que os jogadores atualmente estão empatados, e negativo, indicando que o jogador está a perder de momento.
   
-  - O cálculo do valor acima referido é auxiliado pelo predicado `evaluate/3` que calcula apenas a soma do número de ligações das peças do jogador que estamos a avaliar. No exemplo abaixo `0` simboliza as peças brancas (que contêm o prefixo `w`) e `1` simboliza as peças pretas (que contêm o prefixo `b`).
+  - O cálculo do valor acima referido é auxiliado pelo predicado `evaluate/3` do módulo `splinter` que calcula apenas a soma do número de ligações das peças do jogador que estamos a avaliar (utilizando `link_count/4` do mesmo módulo). No exemplo abaixo `0` simboliza as peças brancas (que contêm o prefixo `w`) e `1` simboliza as peças pretas (que contêm o prefixo `b`).
   
     ```prolog
     | ?- evaluate([[wp,<>,<>],
-    			   [<>,bp,wp],
-    			   [<>,bp,bp]],0,V).
+                   [<>,bp,wp],
+                   [<>,bp,bp]],0,V).
     V = 4 ? 
     yes
     | ?- evaluate([[wp,<>,<>],
-    			   [<>,bp,wp],
-    			   [<>,bp,bp]],1,V).
+                   [<>,bp,wp],
+                   [<>,bp,bp]],1,V).
     V = 10 ? 
     yes
     ```
   
-  - O predicado `value/3` executa o predicado `evaluate/3` duas vezes com jogadores diferentes e subtrai ao valor do jogador atual o valor do jogador proponente.
+  - O predicado `value/3` executa o predicado `evaluate/3` duas vezes com jogadores diferentes e subtrai ao valor do jogador atual o valor do jogador proponente. É de notar que, caso o mesmo tabuleiro de jogo seja inserido como argumento desta função mas com jogadores diferentes os valores obtidos serão simétricos.
   
 - <u>**Jogada do Computador**</u>:
   
   - O nível 1 do Computador obtém uma lista de jogadas possíveis para determinado estado do tabuleiro, através do predicado `valid_moves/3` e escolhe uma jogada aleatória, através do predicado `random_member/2` do módulo `random` do SICStus.
-  - O nível 2 do Computador comporta-se de modo semelhante ao anterior, no entanto, ao invés de propor uma jogada aleatória (de `valid_moves/3`) é anteriormente filtrado para uma nova lista o conjunto de melhores jogadas possíveis através dos predicados `best_moves/4` e `value/3`, e a partir desta é então selecionada uma jogada aleatória com o predicado `random_member/2`.
+  - O nível 2 do Computador comporta-se de modo semelhante ao anterior, no entanto, ao invés de propor uma jogada aleatória (proveniente de `valid_moves/3`) é anteriormente filtrado para uma nova lista o conjunto de melhores jogadas possíveis através dos predicados `best_moves/4` e `value/3`, e a partir desta é então selecionada uma jogada aleatória com o predicado `random_member/2`.
 
 
 ## Conclusões
@@ -218,8 +220,8 @@ O trabalho teve como objetivo aplicar os conceitos assimilados na segunda metade
 
 #### Grupo Splinter_1
 
-| Elementos                                           | Percentagem |
-| --------------------------------------------------- | :---------: |
-| Adriano Filipe Ribeiro Soares (<up201904873@up.pt>) |     50%     |
-| Vasco Alves (<up201808031@up.pt>)                   |     50%     |
+| Elementos                                                 | Percentagem |
+| --------------------------------------------------------- | :---------: |
+| Adriano Filipe Ribeiro Soares (<up201904873@up.pt>)       |     50%     |
+| Vasco Marinho Rodrigues Gomes Alves (<up201808031@up.pt>) |     50%     |
 
