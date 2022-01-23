@@ -4,8 +4,8 @@
 
 | Elementos                                                 | Percentagem |
 | --------------------------------------------------------- | :---------: |
-| Adriano Filipe Ribeiro Soares (<up201904873@up.pt>)       |     50%     |
-| Vasco Marinho Rodrigues Gomes Alves (<up201808031@up.pt>) |     50%     |
+| Adriano Filipe Ribeiro Soares (<up201904873@up.pt>)       |     55%     |
+| Vasco Marinho Rodrigues Gomes Alves (<up201808031@up.pt>) |     45%     |
 
 ## Instalação e Execução
 
