@@ -104,3 +104,4 @@ Displays the winner of the game.
 */
 display_winner(0) :- write('White pieces\'s win!\n').
 display_winner(1) :- write('Black pieces\'s win!\n').
+display_winner(-1) :- write('It\'s a tie!\n').

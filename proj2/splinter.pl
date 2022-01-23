@@ -50,7 +50,9 @@ get_move(Board, player, _, X, Y, D) :-
 
 get_move(Board, AIDifficulty, Turn, X, Y, D) :-
     choose_move(Board, AIDifficulty, Turn, X, Y, D),
-    display_ai_move(X, Y, D).   % DEBUG: To test the AI's difficulty difference more easily we can comment this line and play a AI vs AI game with different difficulties.
+    display_ai_move(X, Y, D).   % DEBUG: To test the AI's difficulty difference more
+                                % easily we can comment this line and play a AI vs AI
+                                % game with different difficulties.
 
 /*
 Game over checker, the game ends when both kings can't reach each other.
