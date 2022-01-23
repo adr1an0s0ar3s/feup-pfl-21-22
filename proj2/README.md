@@ -1,99 +1,204 @@
-# TP2 - Splinter Board Game
+# <u>Trabalho Prático #2 - Splinter Board Game</u>
 
 ## Descrição do Jogo
 
-- <u>Componentes</u>:
+- **<u>Componentes</u>**:
+  - 2 Jogadores;
+  - Tabuleiro 18x15;
+  - 14 Peões Brancos, 14 Peões Pretos, 1 Rei Branco e 1 Rei Preto.
+- <u>**Objetivo**</u>:
+  - O objetivo do jogo é fazer *splinter* ao rei do oponente de modo que este fique num grupo mais pequeno do que o nosso.
 
-  - 2 Jogadores
-  - Tabuleiro (18 x 15 quadrados)
-  - 14 Peões Brancos e 14 Peões Pretos
-  - 1 Rei Branco e 1 Rei Preto
+- <u>**Como Jogar**</u>:
+  - Organizar o tabuleiro de modo a que as peças estejam num único grupo, conectado, com os reis a ocupar os quadrados centrais do tabuleiro;
 
-- <u>Objetivo</u>:
+|           ![](./doc/images/image1.png)           |
+| :----------------------------------------------: |
+| *Figura 1: Estado do tabuleiro de jogo inicial.* |
 
-  - O objetivo do jogo é fazer "splinter" ao rei do oponente de modo que este fique num grupo mais pequeno do que o nosso.
+  - Escolher um jogador para iniciar o jogo (peças brancas ou pretas) e depois continuar com turnos alternados;
+  - No nosso turno, mover uma das nossas peças um quadrado em qualquer direção, incluindo diagonalmente, de modo a cair num quadrado adjacente. Qualquer peça que esteja no caminho é simplesmente puxada na mesma direção. Não há limite para o número de peças que se pode puxar;
+  - Um *splinter* ocorre quando uma ou mais peças ficam desconectadas do grupo original, havendo quadrados vazios entre essas peças a o grupo. Após um *splinter*, todos os grupos que não tiverem um rei estão fora do jogo e os seus peões são removidos do tabuleiro;
 
-- <u>Como jogar</u>:
+|                 ![](./doc/images/image2.png)                 |                 ![](./doc/images/image3.png)                 |
+| :----------------------------------------------------------: | :----------------------------------------------------------: |
+| *Figura 2: Estado do tabuleiro do jogo sem ocorrência de splinter.* | *Figura 3: Estado do tabuleiro do jogo com ocorrência de splinter.* |
 
-  - Organizar o tabuleiro de modo a que as peças estejam num único grupo, conectado, com os reis a ocupar os quadrados centrais do tabuleiro.
+  - Se um *splinter* resultar nos reis a ocupar grupos diferentes, o jogo acaba e o jogador cujo rei estiver no maior grupo vence o jogo (peças de ambas as cores valem o mesmo). Se os dois grupos forem de tamanho igual, o jogador que tiver perdido menos peões ganha o jogo. Se ambos os jogadores tiverem perdido o mesmo número de peões, o jogo acaba empatado. Adicionalmente, se um *splinter* levar a que um jogador fique sem peões, o jogo acaba e o outro jogador vence.
 
-  ![](./doc/images/image1.png)
-
-  - Escolher um jogador para iniciar o jogo (peças brancas ou pretas) e depois continuar com turnos alternados.
-  - No nosso turno, mover uma das nossas peças um quadrado em qualquer direção, incluindo diagonalmente, de modo a cair num quadrado adjacente. Qualquer peça que esteja no caminho é simplesmente puxada na mesma direção. Não há limite para o número de peças que se pode puxar.
-  - Um "splinter" ocorre quando uma ou mais peças ficam desconectadas do grupo original, havendo quadrados vazios entre essas peças a o grupo. Após um "splinter", todos os grupos que não tiverem um rei estão fora do jogo e os seus peões são removidos do tabuleiro.
-
-  | ![](./doc/images/image2.png) | ![](./doc/images/image3.png) |
-  | :--------------------------: | :--------------------------: |
-  |   Não ocorreu Splinter       |    Ocorreu Splinter          |
-
-  - Se um "splinter" resultar nos reis a ocupar grupos diferentes, o jogo acaba e o jogador cujo rei estiver no maior grupo vence o jogo (peças de ambas as cores valem o mesmo). Se os dois grupos forem de tamanho igual, o jogador que tiver perdido menos peões ganha o jogo. Se ambos os jogadores tiverem perdido o mesmo número de peões, o jogo acaba empatado. Adicionalmente, se um "splinter" levar a que um jogador fique sem peões, o jogo acaba e o outro jogador vence.
-
-- <u>Referências</u>:
-  - [Splinter](https://splinterboardgame.blogspot.com/2021/06/splinter-is-two-player-abstractstrategy.html)
+  > <u>**Referências**</u>: [Splinter Board Game](https://splinterboardgame.blogspot.com/2021/06/splinter-is-two-player-abstractstrategy.html)
 
 ## Lógica do Jogo
 
-O jogo é inicializado com o predicado play/0, que é responsável por apresentar o menú inicial e começar o game_loop de acordo com a opção de jogo escolhida. Há quatro opções válidas, PvP, PvC, CvP e CvC. No caso de ser escolhido um modo de jogo que envolva o computador, é pedido ao utilizador para escolher o seu nível de inteligência. Quer para a escolha do modo de jogo quer para a escolha do nível da IA é efetuada e verificação de input, pedindo ao utilizador para voltar a introduzir a sua opção caso este seja inválido.
+- <u>**Início de Jogo**</u>:
+  - O jogo é inicializado com o predicado `play/0`, que é responsável por apresentar o menu inicial e começar o `game_loop/3` de acordo com a opção de jogo escolhida. Existem quatro opções válidas, H/H, H/PC, PC/H e PC/PC. No caso de ser escolhido um modo de jogo que envolva o computador é pedido ao utilizador para escolher o seu nível de inteligência. Quer para a escolha do modo de jogo quer para a escolha do nível da IA é efetuada e verificação de input, pedindo ao utilizador para voltar a introduzir a sua opção caso este seja inválido (com a utilização do módulo `input` por nós criado);
 
-TODO: IMAGEM
-
-- <u>Representação Interna do Estado do Jogo</u>:
-  - Para representar o tabuleiro, é usada uma lista de listas, sendo os peões brancos e pretos representados por "wp" e "bp" respectivamente. O rei branco é representado por "wk" e o rei preto por "bk". Os espaços vazios são representados por "<>".
-
-  - Situação Inicial: O jogo começa com as peças organizadas num bloco central, ocupando posições alternadas e com os dois reis no centro:
-
-    | ![](./doc/images/image2.png) | ![](./doc/images/image3.png) |
-    | :--------------------------: | :--------------------------: |
-    |   Representação Prolog       |    Representação Consola     |
-
-  - Situação Intermédia: Os jogadores podem mover as suas peças em qualquer direção e até empurrar outras peças:
-
-    | ![](./doc/images/image2.png) | ![](./doc/images/image3.png) |
-    | :--------------------------: | :--------------------------: |
-    |   Representação Prolog       |    Representação Consola     |
-
-  - Situação Final: O jogo acaba quandos uma jogada resulta nos dois reis ficarem em grupos separados, ganhando o jogador cujo rei tem o maior grupo:
-
-    | ![](./doc/images/image2.png) | ![](./doc/images/image3.png) |
-    | :--------------------------: | :--------------------------: |
-    |   Representação Prolog       |    Representação Consola     |
+- <u>**Representação Interna do Estado do Jogo**</u>:
   
-TODO: IMAGENS
+  - Para representar o tabuleiro, é usada uma lista de listas, sendo os peões brancos e pretos representados por `wp`  e `bp` respetivamente. O rei branco é representado por `wk` e o rei preto por `bk`. Os espaços vazios são representados por `<>`;
+  
+  - <u>**Estados de Jogo**</u>:
+    - <u>Estado Inicial</u>: O jogo começa com as peças organizadas num bloco central, ocupando posições alternadas e com os dois reis ao centro;
+    
+      ```prolog
+          a    b    c    d    e    f    g    h    i    j    k    l    m    n    o
+      
+      0   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   
+      
+      1   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   
+      
+      2   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   
+      
+      3   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   
+      
+      4   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   
+      
+      5   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   
+      
+      6   <>   <>   <>   <>   <>   bp   wp   bp   wp   bp   <>   <>   <>   <>   <>   
+      
+      7   <>   <>   <>   <>   <>   wp   bp   wp   bp   wp   <>   <>   <>   <>   <>   
+      
+      8   <>   <>   <>   <>   <>   bp   wp   bk   wp   bp   <>   <>   <>   <>   <>   
+      
+      9   <>   <>   <>   <>   <>   wp   bp   wk   bp   wp   <>   <>   <>   <>   <>   
+      
+      10  <>   <>   <>   <>   <>   bp   wp   bp   wp   bp   <>   <>   <>   <>   <>   
+      
+      11  <>   <>   <>   <>   <>   wp   bp   wp   bp   wp   <>   <>   <>   <>   <>   
+      
+      12  <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   
+      
+      13  <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   
+      
+      14  <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   
+      
+      15  <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   
+      
+      16  <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   
+      
+      17  <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>
+      ```
+    
+    - <u>Estado Intermédio</u>: Os jogadores podem mover as suas peças em qualquer direção e até empurrar outras peças;
+    
+      ```prolog
+          a    b    c    d    e    f    g    h    i    j    k    l    m    n    o
+      
+      0   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   
+      
+      1   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   
+      
+      2   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   
+      
+      3   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   
+      
+      4   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   
+      
+      5   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   
+      
+      6   <>   <>   <>   <>   wp   <>   <>   bk   bp   <>   <>   <>   <>   <>   <>   
+      
+      7   <>   <>   <>   <>   <>   bp   bp   <>   wp   <>   <>   <>   <>   <>   <>   
+      
+      8   <>   <>   <>   <>   <>   <>   bp   wp   wp   wp   <>   <>   <>   <>   <>   
+      
+      9   <>   <>   <>   <>   <>   <>   wp   wp   wp   wp   bp   <>   <>   <>   <>   
+      
+      10  <>   <>   <>   <>   <>   <>   wp   wp   wp   wk   bp   <>   <>   <>   <>   
+      
+      11  <>   <>   <>   <>   <>   <>   bp   wp   wp   <>   <>   bp   <>   <>   <>   
+      
+      12  <>   <>   <>   <>   <>   <>   <>   <>   bp   <>   <>   <>   <>   <>   <>   
+      
+      13  <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   
+      
+      14  <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   
+      
+      15  <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   
+      
+      16  <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   
+      
+      17  <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>
+      ```
+    
+    - <u>Estado Final</u>: O jogo acaba quando uma jogada resulta nos dois reis ficarem em grupos separados, ganhando o jogador cujo rei tem o maior grupo.
+    
+      ```prolog
+          a    b    c    d    e    f    g    h    i    j    k    l    m    n    o
+      
+      0   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   
+      
+      1   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   
+      
+      2   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   
+      
+      3   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   
+      
+      4   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   
+      
+      5   <>   <>   <>   <>   <>   <>   <>   <>   bk   <>   <>   <>   <>   <>   <>   
+      
+      6   <>   <>   <>   <>   <>   <>   <>   <>   bp   <>   <>   <>   <>   <>   <>   
+      
+      7   <>   <>   <>   <>   <>   <>   bp   <>   <>   <>   <>   <>   <>   <>   <>   
+      
+      8   <>   <>   <>   <>   <>   <>   bp   wp   wp   wp   <>   <>   <>   <>   <>   
+      
+      9   <>   <>   <>   <>   <>   <>   wp   wp   wp   wp   wp   <>   <>   <>   <>   
+      
+      10  <>   <>   <>   <>   <>   <>   wp   wp   wp   wk   bp   <>   <>   <>   <>   
+      
+      11  <>   <>   <>   <>   <>   <>   <>   wp   wp   <>   <>   bp   <>   <>   <>   
+      
+      12  <>   <>   <>   <>   <>   <>   bp   <>   bp   <>   <>   <>   <>   <>   <>   
+      
+      13  <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   
+      
+      14  <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   
+      
+      15  <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   
+      
+      16  <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   
+      
+      17  <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   <>   
+      
+      White pieces's win!
+      ```
 
-- <u>Visualização do Estado do Jogo</u>:
-  - Para visualização do tabuleiro, foram utilizados os predicados do módulo show. Através do predicado display_game/1 é mostrado o tabuleiro, com identificação numérica para as linhas e alfabética para as colunas. Este predicado utiliza diversos predicados auxiliares, nomeadamente predicados que funcionam de forma recursiva para imprimir quer uma única linha quer a matriz completa.
+- <u>**Visualização do Estado do Jogo**</u>:
+  - Toda a visualização do jogo é efetuada pelo módulo `output` por nós criado;
+  - Para a visualização do menu é utilizado o predicado `display_start_menu/0`. Este tem as quatro opções de jogo acima referidas (H/H, P/PC, PC/H e PC/PC). Após o input do utilizador e a verificação da mesma efetuada pelos predicados `read_option/2`, `validate_option/3` e `read_ai_difficulty/1` do módulo `input`, o jogo é inicializado. Uma pequena animação de início de jogo é realizada anteriormente (`display_starting_game_animation/0`);
+  - O estado inicial de jogo é obtido através do predicado `initial_state/1` que, pela natureza do nosso jogo, tem um tamanho estático. Através do predicado `display_game/1` é mostrado o tabuleiro, com identificação numérica para as linhas e alfabética para as colunas através do predicado `display_header/1` auxiliado pelo predicado `number_to_char/2` do módulo `utils` por nós criado. Utilizamos diversos predicados auxiliares, nomeadamente predicados que funcionam de forma recursiva para imprimir quer uma única linha (`display_line/1`) quer a matriz completa (`display_matrix/1`).
 
-TODO: IMAGEM E CÓDIGO.
 
-- <u>Execução de Jogadas</u>:
-  - Inicialmente é verificado se a jogada introduzida pelo utilizador é válida. É necessário verificar se a posição escolhida existe no tabuleiro, se tem uma peça sua e se a direção do movimento é válida.
-  - Após o utilizador introduzir um jogada válida, a mesma é realizada através do predicado move, que por sua vez chama o predicado push_right. Para facilitar, só foi implementado o movimento para Este. Assim, para mover em qualquer outra direção é necessário efetuar algumas transformações no tabuleiro ou na linha, chamar o push_right e depois reverter essas transformações.
+- <u>**Execução de Jogadas**</u>:
+  - Inicialmente é verificado se a jogada introduzida pelo utilizador é válida através do predicado `read_move/4` do módulo `input`. É necessário verificar se a posição escolhida existe no tabuleiro (`inside_matrix/3` do módulo `utils`) e se a direção do movimento é válida (`valid_direction/1` do módulo `utils`). O formato do movimento a ser introduzido é `X-Y-D` no qual `X` é um carácter que simboliza uma coluna, `Y` é um inteiro que simboliza uma linha e `D` é a direção da jogada podendo esta ser `n, ne, e, se, s, so, o, no`. A nosso ver é uma forma fácil, rápida e intuitiva do jogador introduzir a jogada que pretende.
+  - Após o utilizador introduzir um jogada válida, a mesma é realizada através do predicado `move/6`, que por sua vez chama o predicado `push_right/4`.  De modo a facilitar a implementação do jogo apenas foi implementado o movimento para a direção **Este** (`push_right/4`). Deste modo, para mover em qualquer outra direção é apenas necessário efetuar transformações ao nível do tabuleiro ou ao nível da linha (auxílio das funções `reverse/2`, `transpose/2` e `nth0/3`do módulo `lists` do SICStus, as quais serviram de base para muitas funções auxiliares presentes no nosso módulo `utils`), executar o predicado `push_right/4` e reverter as transformações efetuadas anteriormente.
+- <u>**Final de Jogo**</u>:
+  - Após cada jogada é necessário verificar se o fim de jogo foi originado através do *splinter* de um dos reis através do predicado `game_over/1`. Caso o fim de jogo seja alcançado o predicado `winner/2` é executado de forma a obter o vencedor mediante as peças no grupo do rei de cada jogador.
+  - **NOTA**: No jogo por nós implementado um rei nunca será alvo de *splinter*, deste modo um jogador nunca poderá ficar sem peças para jogar, assim, de forma a acabar o jogo o rei tem de ativamente sair do grupo do rei oponente para o jogo finalizar. O vencedor será o correto, dado que o jogador não possui peças e consequentemente possui menos ou igual número de peças do oponente.
+- <u>**Lista de Jogadas Válidas**</u>:
+  - TODO
+- <u>**Avaliação do Estado do Jogo**</u>:
+  - TODO
 
-- <u>Final de Jogo</u>:
-  - Após cada jogada é necessário verificar se foi causado o fim de jogo, quer através do "splinter" de um dos reis quer através do fim de possíveis jogadas para um dos jogadores. TODO
+- <u>**Jogada do Computador**</u>:
+  - TODO
+  - O nível 1 do Computador obtém uma lista de jogadas possíveis para determinado estado do tabuleiro, através do predicado valid_moves/6 e simplesmente escolhe uma jogada aleatória, através do predicado random_member/2;
+  - O nível 2 do Computador comporta-se de modo semelhante ao anterior, mas ao invés de escolher logo uma jogada aleatória, é antes filtrado para uma nova lista o conjunto de melhores jogadas possíveis, e a partir dessa lista é então selecionada uma jogada aleatoriamente.
 
-- <u>Lista de Jogadas Válidas</u>:
-  - Uma jogada é válida se for escrita no formato Coluna-Linha-Direção e os seus parêmetros forem válidos, ou seja, a posição tem que estar dentro do tabuleiro e ter uma peça do jogador e a direção tem que ser uma das 8 direções: n, s, e, o, ne, no, se, so. É importante lembrar que é possível empurrar peças, logo não interessa se o quadrado para o qual o utilizador pretende mover a sua peça está ocupado. É verificado se o input do utilizador obedece a estas regras, e caso não seja é-lhe pedido para introduzir novamente um jogada.
-
-- <u>Avaliação do Estado do Jogo</u>:
-
-- <u>Jogada do Computador</u>:
-  - O nível 1 do Computador obtém uma lista de jogadas possíveis para determinado estado do tabuleiro, através do predicado valid_moves/6 e simplesmente escolhe uma jogada aleatória, através do predicado random_member/2.
-  - O nível 2 do Computador comporta-se de modo semelhante ao anterior, mas ao invés de escolher logo uma jogada aleatória, é antes filtrado para uma nova lista o conjunto de melhores jogadas possíveis, e a partir dessa lista é então selecionada uma jogada aleatoriamente. TODO:DIZER O QUE SAO AS MELHORES JOGADAS
 
 ## Conclusões
 
-O trabalho teve como objetivo aplicar os conceitos aprendidos na segunda metade da Unidade Curricular de Programação Funcional e em Lógica, através da utilização da linguagem Prolog.
+O trabalho teve como objetivo aplicar os conceitos assimilados na segunda metade da Unidade Curricular de Programação Funcional e em Lógica, através da utilização da linguagem Prolog. Concluímos que o trabalho foi realizado com sucesso e a sua realização foi uma mais valia quer para a consolidação dos temas apresentados na unidade curricular, quer para o nosso futuro como engenheiros.
 
-Concluimos que o trabalho foi realizado com sucesso e a sua realização foi uma mais valia quer para a consolidação dos temas apresentados na UC, quer para o nosso futuro como engenheiros informáticos.
+---
 
-## Bibliografia
+#### Grupo Splinter_1
 
-- [Splinter](https://splinterboardgame.blogspot.com/2021/06/splinter-is-two-player-abstractstrategy.html)
+| Elementos                                           | Percentagem |
+| --------------------------------------------------- | :---------: |
+| Adriano Filipe Ribeiro Soares (<up201904873@up.pt>) |     50%     |
+| Vasco Alves (<up201808031@up.pt>)                   |     50%     |
 
-
-# Grupo Splinter_1
-
-- Adriano Soares <up201904873@up.pt>
-- Vasco Alves <up201808031@up.pt>

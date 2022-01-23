@@ -53,6 +53,13 @@ get_move(Board, AIDifficulty, Turn, X, Y, D) :-
     display_ai_move(X, Y, D).   % DEBUG: To test the AI's difficulty difference more easily we can comment this line and play a AI vs AI game with different difficulties.
 
 /*
+Game over checker, the game ends when both kings can't reach each other.
+*/
+game_over(Board) :-
+    get_king_position(Board, X, Y),
+    \+ find_a_king(Board, X, Y, _).
+
+/*
 IMPORTANT NOTE: This function should only be called after a game over.
 Function that determines the winner after checking if a game over has occured
 by comparing the number of pieces in the same group as the corresponding king.
@@ -252,13 +259,6 @@ get_king_position([L | _], Y, X, Y) :-
 get_king_position([_ | R], Acc1, X, Y) :-
     Acc2 is Acc1 + 1,
     get_king_position(R, Acc2, X, Y).
-
-/*
-Game over checker, the game ends when both kings can't reach each other.
-*/
-game_over(Board) :-
-    get_king_position(Board, X, Y),
-    \+ find_a_king(Board, X, Y, _).
 
 /*
 Obtains the valid moves at a given moment of the game board.
