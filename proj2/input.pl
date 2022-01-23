@@ -23,6 +23,7 @@ read_ai_difficulty(AIDifficulty) :-
     repeat,
     write('Please select a valid AI difficulty (0 or 1):\n'),
     read(AIDifficulty),
+    integer(AIDifficulty),
     AIDifficulty >= 0, AIDifficulty =< 1.
 
 /*
