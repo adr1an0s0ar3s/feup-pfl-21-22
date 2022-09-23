@@ -23,7 +23,7 @@ O nosso projeto está dividido por quatro módulos distintos: `splinter`, `outpu
 - <u>**Como Jogar**</u>:
   - Organizar o tabuleiro de modo a que as peças estejam num único grupo, conectado, com os reis a ocupar os quadrados centrais do tabuleiro.
 
-|           ![](./doc/images/image1.png)           |
+|           ![](./doc/image1.png)                  |
 | :----------------------------------------------: |
 | *Figura 1: Estado do tabuleiro de jogo inicial.* |
 
@@ -31,7 +31,7 @@ O nosso projeto está dividido por quatro módulos distintos: `splinter`, `outpu
   - No nosso turno, mover uma das nossas peças um quadrado em qualquer direção, incluindo diagonalmente, de modo a cair num quadrado adjacente. Qualquer peça que esteja no caminho é simplesmente puxada na mesma direção. Não há limite para o número de peças que se pode puxar.
   - Um *splinter* ocorre quando uma ou mais peças ficam desconectadas do grupo original, havendo quadrados vazios entre essas peças a o grupo. Após um *splinter*, todos os grupos que não tiverem um rei estão fora do jogo e os seus peões são removidos do tabuleiro.
 
-|                 ![](./doc/images/image2.png)                 |                 ![](./doc/images/image3.png)                 |
+|                 ![](./doc/image2.png)                        |                 ![](./doc/image3.png)                        |
 | :----------------------------------------------------------: | :----------------------------------------------------------: |
 | *Figura 2: Estado do tabuleiro do jogo sem ocorrência de splinter.* | *Figura 3: Estado do tabuleiro do jogo com ocorrência de splinter.* |
 
